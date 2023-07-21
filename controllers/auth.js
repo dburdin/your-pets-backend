@@ -17,12 +17,15 @@ const register = async (req, res) => {
   if (user) {
     throw HttpError(409, "Email already in use");
   }
-
+  const avatarURL = `${req.protocol}://${req.get(
+    "host"
+  )}/avatars/defaultAvatar.png`;
   const hashPassword = await bcrypt.hash(password, 10);
 
   const newUser = await User.create({
     ...req.body,
     password: hashPassword,
+    avatarURL,
   });
 
   res.status(201).json({

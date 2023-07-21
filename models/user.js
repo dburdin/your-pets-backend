@@ -27,7 +27,7 @@ const userSchema = new Schema(
     },
     birthDate: { type: String, match: dateRegex, default: "00-00-0000" },
 
-    avatarURL: { type: String, required: true, default: "temp" },
+    avatarURL: { type: String, required: true, default: "avatars/defaultAvatar.png" },
     city: { type: String },
     phone: { type: String },
     token: {
