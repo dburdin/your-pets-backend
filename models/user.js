@@ -25,7 +25,12 @@ const userSchema = new Schema(
       required: true,
       unique: true,
     },
-    birthDate: { type: String, match: dateRegex, default: "00-00-0000" },
+    birthDate: {
+      type: String,
+      match: dateRegex,
+      default: "00-00-0000",
+      required: true,
+    },
 
     avatarURL: {
       type: String,
@@ -62,11 +67,11 @@ const loginSchema = Joi.object({
 });
 
 const updateSchema = Joi.object({
-  name: Joi.string().min(2).max(16).required(),
-  email: Joi.string().pattern(emailRegex).required().messages({
+  name: Joi.string().min(2).max(16),
+  email: Joi.string().pattern(emailRegex).messages({
     "string.pattern.base": "email should looks like: example@example.com",
   }),
-  birthDate: Joi.string().pattern(dateRegex).required().messages({
+  birthDate: Joi.string().pattern(dateRegex).messages({
     "string.pattern.base": "Birth date format: DD-MM-YYYY",
   }),
   phone: Joi.string(),
