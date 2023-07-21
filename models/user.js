@@ -1,10 +1,14 @@
 const { Schema, model } = require("mongoose");
 const Joi = require("joi");
-const crypto = require("crypto");
 const { handleMongooseError } = require("../helpers");
 
+//  "example@example.com"
 // eslint-disable-next-line no-useless-escape
-const emailRegexp = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+// password = "Abc123"
+const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{6,16}$/;
+// DD-MM-YYYY
+const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
 
 const userSchema = new Schema(
   {
@@ -15,32 +19,21 @@ const userSchema = new Schema(
     password: {
       type: String,
       required: true,
-      minLength: 6,
     },
     email: {
       type: String,
-      match: emailRegexp,
       required: true,
       unique: true,
     },
+    birthDate: { type: String, match: dateRegex, default: "00-00-0000" },
+
+    avatarURL: { type: String, required: true, default: "temp" },
+    city: { type: String },
+    phone: { type: String },
     token: {
       type: String,
       default: "",
     },
-    avatarURL: {
-      type: String,
-      required: true,
-    },
-    verify: {
-      type: Boolean,
-      default: false,
-    },
-    verificationCode: {
-      type: String,
-      default: "",
-    },
-    passwordResetToken: { type: String },
-    passwordResetExpires: { type: Date },
   },
   { versionKey: false, timestamps: true }
 );
@@ -48,42 +41,19 @@ const userSchema = new Schema(
 userSchema.post("save", handleMongooseError);
 
 const registerSchema = Joi.object({
-  name: Joi.string().required(),
-  email: Joi.string().pattern(emailRegexp).required(),
-  password: Joi.string().min(6).required(),
+  name: Joi.string().min(2).max(16).required(),
+  email: Joi.string().pattern(emailRegex).required(),
+  password: Joi.string().pattern(passwordRegex).required(),
 });
 
 const loginSchema = Joi.object({
-  email: Joi.string().pattern(emailRegexp).required(),
-  password: Joi.string().min(6).required(),
-});
-
-const resetPassword = Joi.object({
-  password: Joi.string().min(6).required(),
-});
-
-const emailSchema = Joi.object({
-  email: Joi.string().pattern(emailRegexp).required(),
+  email: Joi.string().pattern(emailRegex).required(),
+  password: Joi.string().min(6).max(16).required(),
 });
 
 const schemas = {
   registerSchema,
   loginSchema,
-  emailSchema,
-  resetPassword,
-};
-
-userSchema.methods.creatPasswordResetToken = function () {
-  const resetToken = crypto.randomBytes(32).toString("hex");
-
-  this.passwordResetToken = crypto
-    .createHash("sha256")
-    .update(resetToken)
-    .digest("hex");
-
-  this.passwordResetExpires = Date.now() + 10 * 60 * 100;
-
-  return resetToken;
 };
 
 const User = model("user", userSchema);
