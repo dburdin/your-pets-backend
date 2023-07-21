@@ -6,7 +6,7 @@ const fs = require("fs/promises");
 const { ctrlWrapper, HttpError } = require("../helpers");
 const { User } = require("../models/user");
 
-const { SECRET_KEY, BASE_URL } = process.env;
+const { SECRET_KEY } = process.env;
 
 const avatarsDir = path.join(__dirname, "../", "public", "avatars");
 
@@ -66,21 +66,16 @@ const logout = async (req, res) => {
   res.json({ message: "Logout success" });
 };
 
-const updateAvatar = async (req, res) => {
+const updateUser = async (req, res) => {
   const { _id } = req.user;
-  const { path: tempUpload, originalname } = req.file;
 
-  const filename = `${_id}_${originalname}`;
+  const updatedUser = await User.findByIdAndUpdate(
+    _id,
+    { ...req.body },
+    { new: true }
+  );
 
-  const resultUpload = path.join(avatarsDir, filename);
-
-  await fs.rename(tempUpload, resultUpload);
-
-  // we make URL consider that all requests for files redirecting to folder public
-  const avatarURL = path.join("avatars", filename);
-  await User.findByIdAndUpdate(_id, { avatarURL });
-
-  res.json({ avatarURL });
+  res.status(201).json(updatedUser);
 };
 
 module.exports = {
@@ -88,5 +83,5 @@ module.exports = {
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
-  updateAvatar: ctrlWrapper(updateAvatar),
+  updateUser: ctrlWrapper(updateUser),
 };

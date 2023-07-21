@@ -27,7 +27,10 @@ const userSchema = new Schema(
     },
     birthDate: { type: String, match: dateRegex, default: "00-00-0000" },
 
-    avatarURL: { type: String, required: true, default: "avatars/defaultAvatar.png" },
+    avatarURL: {
+      type: String,
+      required: true,
+    },
     city: { type: String },
     phone: { type: String },
     token: {
@@ -42,29 +45,38 @@ userSchema.post("save", handleMongooseError);
 
 const registerSchema = Joi.object({
   name: Joi.string().min(2).max(16).required(),
-  email: Joi.string()
-    .pattern(emailRegex)
-    .required()
-    .messages({
-      "string.pattern.base": "email should looks like: example@example.com",
-    }),
-  password: Joi.string()
-    .pattern(passwordRegex)
-    .required()
-    .messages({
-      "string.pattern.base":
-        "password shoud be: max 16, min 6; contain: one UpperCase letter, one LowerCase letter, one number",
-    }),
+  email: Joi.string().pattern(emailRegex).required().messages({
+    "string.pattern.base": "email should looks like: example@example.com",
+  }),
+  password: Joi.string().pattern(passwordRegex).required().messages({
+    "string.pattern.base":
+      "password shoud be: max 16, min 6; contain: one UpperCase letter, one LowerCase letter, one number",
+  }),
 });
 
 const loginSchema = Joi.object({
-  email: Joi.string().pattern(emailRegex).required(),
+  email: Joi.string().pattern(emailRegex).required().messages({
+    "string.pattern.base": "email should looks like: example@example.com",
+  }),
   password: Joi.string().min(6).max(16).required(),
+});
+
+const updateSchema = Joi.object({
+  name: Joi.string().min(2).max(16).required(),
+  email: Joi.string().pattern(emailRegex).required().messages({
+    "string.pattern.base": "email should looks like: example@example.com",
+  }),
+  birthDate: Joi.string().pattern(dateRegex).required().messages({
+    "string.pattern.base": "Birth date format: DD-MM-YYYY",
+  }),
+  phone: Joi.string(),
+  city: Joi.string(),
 });
 
 const schemas = {
   registerSchema,
   loginSchema,
+  updateSchema,
 };
 
 const User = model("user", userSchema);

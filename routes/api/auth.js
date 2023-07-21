@@ -15,10 +15,10 @@ router.get("/current", authenticate, ctrl.getCurrent);
 router.post("/logout", authenticate, ctrl.logout);
 
 router.patch(
-  "/avatars",
+  "/updateUser",
   authenticate,
-  upload.single("avatar"),
-  ctrl.updateAvatar
+  validateBody(schemas.updateSchema),
+  ctrl.updateUser
 );
 
 module.exports = router;
