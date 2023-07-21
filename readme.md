@@ -3,4 +3,4 @@ dburdin
 dD6VLlN4XK5rBoxg
 
 
-deployed: https://your-pets-backend.onrender.com/
+deployed: https://your-pets-backend.onrender.com
