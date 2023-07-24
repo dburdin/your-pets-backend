@@ -1,14 +1,12 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const path = require("path");
-const fs = require("fs/promises");
+const avatarFolder = require("../constants/avatarFolders");
 
 const { ctrlWrapper, HttpError } = require("../helpers");
 const { User } = require("../models/user");
+const ImageService = require("../services/imageService");
 
 const { SECRET_KEY } = process.env;
-
-const avatarsDir = path.join(__dirname, "../", "public", "avatars");
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -68,6 +66,13 @@ const logout = async (req, res) => {
 
 const updateUser = async (req, res) => {
   const { _id } = req.user;
+  const { file } = req;
+
+  if (file) {
+    if (file.size > 3 * 1024 * 1024) throw HttpError(400, "file size should be less then 3 mb");
+    const { url } = await ImageService.save(req, avatarFolder.userAvatar);
+    req.body.avatarURL = url;
+  }
 
   const updatedUser = await User.findByIdAndUpdate(
     _id,

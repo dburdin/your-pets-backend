@@ -38,6 +38,8 @@ const userSchema = new Schema(
     },
     city: { type: String },
     phone: { type: String },
+    myPets: [{ type: Schema.Types.ObjectId, ref: "pets" }],
+    favoritePets: [{ type: Schema.Types.ObjectId, ref: "pets" }],
     token: {
       type: String,
       default: "",
