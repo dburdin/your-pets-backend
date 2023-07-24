@@ -25,11 +25,21 @@ const userSchema = new Schema(
       required: true,
       unique: true,
     },
-    birthDate: { type: String, match: dateRegex, default: "00-00-0000" },
+    birthDate: {
+      type: String,
+      match: dateRegex,
+      default: "00-00-0000",
+      required: true,
+    },
 
-    avatarURL: { type: String, required: true, default: "avatars/defaultAvatar.png" },
+    avatarURL: {
+      type: String,
+      required: true,
+    },
     city: { type: String },
     phone: { type: String },
+    myPets: [{ type: Schema.Types.ObjectId, ref: "pets" }],
+    favoritePets: [{ type: Schema.Types.ObjectId, ref: "pets" }],
     token: {
       type: String,
       default: "",
@@ -42,29 +52,38 @@ userSchema.post("save", handleMongooseError);
 
 const registerSchema = Joi.object({
   name: Joi.string().min(2).max(16).required(),
-  email: Joi.string()
-    .pattern(emailRegex)
-    .required()
-    .messages({
-      "string.pattern.base": "email should looks like: example@example.com",
-    }),
-  password: Joi.string()
-    .pattern(passwordRegex)
-    .required()
-    .messages({
-      "string.pattern.base":
-        "password shoud be: max 16, min 6; contain: one UpperCase letter, one LowerCase letter, one number",
-    }),
+  email: Joi.string().pattern(emailRegex).required().messages({
+    "string.pattern.base": "email should looks like: example@example.com",
+  }),
+  password: Joi.string().pattern(passwordRegex).required().messages({
+    "string.pattern.base":
+      "password shoud be: max 16, min 6; contain: one UpperCase letter, one LowerCase letter, one number",
+  }),
 });
 
 const loginSchema = Joi.object({
-  email: Joi.string().pattern(emailRegex).required(),
+  email: Joi.string().pattern(emailRegex).required().messages({
+    "string.pattern.base": "email should looks like: example@example.com",
+  }),
   password: Joi.string().min(6).max(16).required(),
+});
+
+const updateSchema = Joi.object({
+  name: Joi.string().min(2).max(16),
+  email: Joi.string().pattern(emailRegex).messages({
+    "string.pattern.base": "email should looks like: example@example.com",
+  }),
+  birthDate: Joi.string().pattern(dateRegex).messages({
+    "string.pattern.base": "Birth date format: DD-MM-YYYY",
+  }),
+  phone: Joi.string(),
+  city: Joi.string(),
 });
 
 const schemas = {
   registerSchema,
   loginSchema,
+  updateSchema,
 };
 
 const User = model("user", userSchema);

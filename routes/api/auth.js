@@ -1,6 +1,11 @@
 const express = require("express");
+const avatarFolder = require("../../constants/avatarFolders");
 
-const { validateBody, authenticate, upload } = require("../../middlewares");
+const {
+  validateBody,
+  authenticate,
+  uploadImage,
+} = require("../../middlewares");
 const { schemas } = require("../../models/user");
 const ctrl = require("../../controllers/auth");
 
@@ -15,10 +20,11 @@ router.get("/current", authenticate, ctrl.getCurrent);
 router.post("/logout", authenticate, ctrl.logout);
 
 router.patch(
-  "/avatars",
+  "/updateUser",
   authenticate,
-  upload.single("avatar"),
-  ctrl.updateAvatar
+  uploadImage(avatarFolder.userAvatar),
+  validateBody(schemas.updateSchema),
+  ctrl.updateUser
 );
 
 module.exports = router;

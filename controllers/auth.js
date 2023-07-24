@@ -1,14 +1,12 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const path = require("path");
-const fs = require("fs/promises");
+const avatarFolder = require("../constants/avatarFolders");
 
 const { ctrlWrapper, HttpError } = require("../helpers");
 const { User } = require("../models/user");
+const ImageService = require("../services/imageService");
 
-const { SECRET_KEY, BASE_URL } = process.env;
-
-const avatarsDir = path.join(__dirname, "../", "public", "avatars");
+const { SECRET_KEY } = process.env;
 
 const register = async (req, res) => {
   const { email, password } = req.body;
@@ -66,21 +64,23 @@ const logout = async (req, res) => {
   res.json({ message: "Logout success" });
 };
 
-const updateAvatar = async (req, res) => {
+const updateUser = async (req, res) => {
   const { _id } = req.user;
-  const { path: tempUpload, originalname } = req.file;
+  const { file } = req;
 
-  const filename = `${_id}_${originalname}`;
+  if (file) {
+    if (file.size > 3 * 1024 * 1024) throw HttpError(400, "file size should be less then 3 mb");
+    const { url } = await ImageService.save(req, avatarFolder.userAvatar);
+    req.body.avatarURL = url;
+  }
 
-  const resultUpload = path.join(avatarsDir, filename);
+  const updatedUser = await User.findByIdAndUpdate(
+    _id,
+    { ...req.body },
+    { new: true }
+  );
 
-  await fs.rename(tempUpload, resultUpload);
-
-  // we make URL consider that all requests for files redirecting to folder public
-  const avatarURL = path.join("avatars", filename);
-  await User.findByIdAndUpdate(_id, { avatarURL });
-
-  res.json({ avatarURL });
+  res.status(201).json(updatedUser);
 };
 
 module.exports = {
@@ -88,5 +88,5 @@ module.exports = {
   login: ctrlWrapper(login),
   getCurrent: ctrlWrapper(getCurrent),
   logout: ctrlWrapper(logout),
-  updateAvatar: ctrlWrapper(updateAvatar),
+  updateUser: ctrlWrapper(updateUser),
 };
