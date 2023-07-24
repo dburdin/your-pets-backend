@@ -6,10 +6,9 @@ const swaggerDocument = require("./swagger.json");
 require("dotenv").config();
 
 const authRouter = require("./routes/api/auth");
-// const noticesRouter = require();
-// const petsRouter = require();
-// const userPetsRouter = require();
 
+const petsRouter = require("./routes/api/pets");
+// const noticesRouter = require();
 // const testRouter = require("./routes/api/test");
 
 const app = express();
@@ -23,12 +22,13 @@ app.use(express.static("public"));
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use("/api/auth", authRouter);
+app.use("/api/pets", petsRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
 });
 
-app.use((err, req, res, next) => {
+app.use((err, req, res) => {
   const { status = 500, message = "Server error" } = err;
 
   res.status(status).json({ message });
