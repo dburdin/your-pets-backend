@@ -1,46 +1,49 @@
 const { Schema, Types, model } = require("mongoose");
 const Joi = require("joi");
 
-const handleMongooseError = require("../helpers");
+const { handleMongooseError } = require("../helpers");
 
 const generalRegExp = /^[a-zA-Z]+$/;
 const dateRegExp = /^\d{2}-\d{2}-\d{4}$/;
 
-const petSchema = new Schema({
-  name: {
-    type: String,
-    minLength: 2,
-    maxLength: 16,
-    match: [generalRegExp, "Only English letters can be accepted"],
-    required: [true, "Pet's name is required"],
+const petSchema = new Schema(
+  {
+    name: {
+      type: String,
+      minLength: 2,
+      maxLength: 16,
+      match: [generalRegExp, "Only English letters can be accepted"],
+      required: [true, "Pet's name is required"],
+    },
+    birthday: {
+      type: String,
+      match: [dateRegExp, "Only DD-MM-YYYY format can be accepted"],
+      required: [true, "Pet's birthday is required"],
+    },
+    type: {
+      type: String,
+      minLength: 2,
+      maxLength: 16,
+      match: [generalRegExp, "Only English letters can be accepted"],
+      required: [true, "Pet's type is required"],
+    },
+    comments: {
+      type: String,
+      minLength: 1,
+      maxLength: 120,
+      default: null,
+    },
+    petAvatar: {
+      type: String,
+    },
+    owner: {
+      type: Types.ObjectId,
+      ref: "user",
+      required: [true, "Pet must have an owner"],
+    },
   },
-  birthday: {
-    type: String,
-    match: [dateRegExp, "Only DD-MM-YYYY format can be accepted"],
-    required: [true, "Pet's birthday is required"],
-  },
-  type: {
-    type: String,
-    minLength: 2,
-    maxLength: 16,
-    match: [generalRegExp, "Only English letters can be accepted"],
-    required: [true, "Pet's type is required"],
-  },
-  comments: {
-    type: String,
-    minLength: 1,
-    maxLength: 120,
-    default: null,
-  },
-  petsAvatar: {
-    type: String,
-  },
-  owner: {
-    type: Types.ObjectId,
-    ref: "user",
-    required: [true, "Pet must have an owner"],
-  },
-});
+  { timestamps: true, versionKey: false }
+);
 
 petSchema.post("save", handleMongooseError);
 
@@ -57,9 +60,9 @@ const joiPetSchema = Joi.object({
     .regex(generalRegExp, "Only English letters can be accepted")
     .required(),
   comments: Joi.string().min(1).max(120),
-  petsAvatar: Joi.string(),
+  petAvatar: Joi.string(),
 });
 
-const Pet = model("Pet", petSchema);
+const Pet = model("pet", petSchema);
 
 module.exports = { Pet, joiPetSchema };
