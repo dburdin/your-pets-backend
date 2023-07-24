@@ -28,6 +28,7 @@ const register = async (req, res) => {
 
   res.status(201).json({
     email: newUser.email,
+    id: newUser._id,
   });
 };
 
@@ -52,9 +53,9 @@ const login = async (req, res) => {
 };
 
 const getCurrent = (req, res) => {
-  const { email, name } = req.user;
+  const { email, name, _id } = req.user;
 
-  res.json({ email, name });
+  res.json({ email, name, _id });
 };
 
 const logout = async (req, res) => {
@@ -69,7 +70,9 @@ const updateUser = async (req, res) => {
   const { file } = req;
 
   if (file) {
-    if (file.size > 3 * 1024 * 1024) throw HttpError(400, "file size should be less then 3 mb");
+    if (file.size > 3 * 1024 * 1024) {
+      throw HttpError(400, "file size should be less then 3 mb");
+    }
     const { url } = await ImageService.save(req, avatarFolder.userAvatar);
     req.body.avatarURL = url;
   }
@@ -79,7 +82,7 @@ const updateUser = async (req, res) => {
     { ...req.body },
     { new: true }
   );
-
+  updatedUser.password = "";
   res.status(201).json(updatedUser);
 };
 

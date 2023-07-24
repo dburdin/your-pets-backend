@@ -1,0 +1,365 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "version": "1.0.0",
+    "title": "Your Pet",
+    "description": "API for Your Pet",
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "consumes": ["application/json", "multipart/form-data"],
+  "produces": ["application/json"],
+  "servers": [
+    { "url": "http://localhost:8000/api" },
+    { "url": "https://your-pets-backend.onrender.com/api" }
+  ],
+  "tags": [
+    {
+      "name": "Auth",
+      "description": "Authentication endpoints"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User registration",
+        "parameters": [],
+        "requestBody": {
+          "description": "Registration's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegistrationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          },
+          "409": {
+            "description": "Provided email already exists",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "User authentication",
+        "parameters": [],
+        "requestBody": {
+          "description": "Authentication's object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthenticationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "Access token"
+                  }
+                },
+                "example": {
+                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0YmU1OWYwMTMY5MDE5NjQ3MiwiZXhwIjoxNjkwMjc5MjcyfQ.kHAw5zUtNTJVkdPyivaFCjSMpidIw"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Please provide email and password",
+            "content": {}
+          },
+          "401": {
+            "description": "Wrong credentials",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/auth/current": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "Get current logged in user info",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserResponse" }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Get current logged in user info",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {}
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/auth/updateUser": {
+      "patch": {
+        "tags": ["Auth"],
+        "summary": "Update user information",
+        "parameters": [],
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "description": "Update object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRequest"
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userAvatar": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserFullResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RegistrationRequest": {
+        "type": "object",
+        "required": ["name", "email", "password"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "format": "name",
+            "example": "John Dow"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "Qwerty123"
+          }
+        }
+      },
+      "UpdateRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "format": "name",
+            "example": "John Dow"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "birthDate": {
+            "type": "string",
+            "description": "User's birthday date",
+            "example": "30-12-1999"
+          },
+          "city": {
+            "type": "string",
+            "description": "User's city",
+            "example": "Lviv"
+          },
+          "phone": {
+            "type": "string",
+            "description": "User's phone number",
+            "example": "+380501234567"
+          }
+        }
+      },
+      "UserFullResponse": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "string",
+            "description": "User's id",
+            "example": "321zssd43232436545474"
+          },
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "format": "name",
+            "example": "John Dow"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "birthDate": {
+            "type": "string",
+            "description": "User's birthday date",
+            "example": "30-12-1999"
+          },
+          "city": {
+            "type": "string",
+            "description": "User's city",
+            "example": "Lviv"
+          },
+          "phone": {
+            "type": "string",
+            "description": "User's phone number",
+            "example": "+380501234567"
+          },
+          "avatarURL": {
+            "type": "string",
+            "description": "URL to user's avatar",
+            "example": "http://localhost:8000/avatars/defaultAvatar.png"
+          },
+          "token": {
+            "type": "string",
+            "description": "Access token",
+            "example": "iJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjTMzNGRkNDJhMjA1YmNkOSIsImlhdCI6MTY5MDIwMjA4MCwiZXhwIjoxNjkwMjg0ODgwfQ.tMnqxlro4JMvOAMeH2xitW7KVIrz07Ej-n6ES-T5vHg"
+          },
+          "myPets": { "type": "array", "items": { "type": "string" } },
+          "favoritePets": { "type": "array", "items": { "type": "string" } }
+        },
+        "example": {
+          "_id": "64be59f01334d2a205bcd9",
+          "name": "John Dow",
+          "password": "",
+          "email": "example@example.com",
+          "birthDate": "00-00-0000",
+          "city": "Lviv",
+          "phone": "+380501234567",
+          "avatarURL": "http://localhost:8000/avatars/defaultAvatar.png",
+          "myPets": [],
+          "favoritePets": [],
+          "token": "iJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjTMzNGRkNDJhMjA1YmNkOSIsImlhdCI6MTY5MDIwMjA4MCwiZXhwIjoxNjkwMjg0ODgwfQ.tMnqxlro4JMvOAMeH2xitW7KVIrz07Ej-n6ES-T5vHg",
+          "createdAt": "2023-07-24T11:01:04.419Z",
+          "updatedAt": "2023-07-24T12:34:40.613Z"
+        }
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "User's name",
+            "format": "name",
+            "example": "John Dow"
+          },
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "userId": {
+            "type": "string",
+            "description": "User's id",
+            "example": "321zssd43232436545474"
+          }
+        },
+        "example": {
+          "name": "John Dow",
+          "email": "user@example.com",
+          "userId": "321zssd43232436545474"
+        }
+      },
+      "AuthenticationRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "User's email",
+            "format": "email"
+          },
+          "password": {
+            "type": "string",
+            "description": "User's password",
+            "example": "Qwerty123"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
