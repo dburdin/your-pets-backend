@@ -10,6 +10,7 @@ const authRouter = require("./routes/api/auth");
 const petsRouter = require("./routes/api/pets");
 // const noticesRouter = require();
 // const testRouter = require("./routes/api/test");
+const friendsRouter = require("./routes/api/friends");
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use("/api/auth", authRouter);
 app.use("/api/pets", petsRouter);
+app.use("/api/friends", friendsRouter);
 
 app.use((req, res) => {
   res.status(404).json({ message: "Not found" });
