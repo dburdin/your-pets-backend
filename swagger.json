@@ -19,7 +19,8 @@
     {
       "name": "Auth",
       "description": "Authentication endpoints"
-    }
+    },
+    { "name": "Friends", "description": "Get all friends" }
   ],
   "paths": {
     "/auth/register": {
@@ -191,6 +192,22 @@
           }
         }
       }
+    },
+    "/friends": {
+      "get": {
+        "tags": ["Friends"],
+        "summary": "Get list of friends",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/FriendsResponse" }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -350,6 +367,59 @@
             "type": "string",
             "description": "User's password",
             "example": "Qwerty123"
+          }
+        }
+      },
+      "FriendsResponse": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "url": {
+              "type": "string",
+              "description":"Company's website",
+              "format": "uri"
+            },
+            "addressUrl": {
+              "type": "string",
+              "description": "Company's address in Google maps",
+              "format": "uri"
+            },
+            "imageUrl": {
+              "type": "string",
+              "description": "Company's logo",
+              "format": "uri"
+            },
+            "address": {
+              "type": "string"
+            },
+            "workDays": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "isOpen": {
+                    "type": "boolean"
+                  },
+                  "from": {
+                    "type": "string"
+                  },
+                  "to": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "phone": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "format":"email"
+            }
           }
         }
       }
