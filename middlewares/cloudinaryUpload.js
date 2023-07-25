@@ -4,6 +4,8 @@ require("dotenv").config();
 const multer = require("multer");
 const path = require("path");
 
+const { HttpError } = require("../helpers");
+
 const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_SECRET_KEY } = process.env;
 
 cloudinary.config({
@@ -33,7 +35,18 @@ const localStorageForPets = multer.diskStorage({
   },
 });
 
-const uploadCloudPet = multer({ storage: storageForPets });
+const uploadCloudPet = multer({
+  storage: storageForPets,
+  limits: {
+    fileSize: 3 * 1024 * 1024,
+  },
+  fileFilter: (req, file, cb) => {
+    if (!file.mimetype.startsWith("image")) {
+      return cb(HttpError(400, "File should be an image"));
+    }
+    cb(null, true);
+  },
+});
 
 module.exports = {
   uploadCloudPet,
