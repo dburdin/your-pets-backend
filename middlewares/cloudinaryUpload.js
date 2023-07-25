@@ -21,6 +21,7 @@ const storageForPets = new CloudinaryStorage({
   },
   params: {
     folder: () => "petAvatar",
+    transformation: [{ width: 250, height: 250, crop: "fill" }, { quality: 80 }],
   },
 });
 const localStorageForPets = multer.diskStorage({
