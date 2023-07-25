@@ -15,10 +15,12 @@ const getAllPets = async (req, res) => {
 const addPet = async (req, res) => {
   const { _id: owner } = req.user;
 
+  const { file } = req;
+
   const result = await Pet.create({
     ...req.body,
     owner,
-    petAvatar: req.file.path,
+    petAvatar: file.path,
   });
 
   res.status(201).json(result);
