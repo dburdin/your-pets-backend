@@ -20,7 +20,8 @@
       "name": "Auth",
       "description": "Authentication endpoints"
     },
-    { "name": "Friends", "description": "Get all friends" }
+    { "name": "Friends", "description": "Get all friends" },
+    {"name": "Pets", "description": "Pets endpoints"}
   ],
   "paths": {
     "/auth/register": {
@@ -205,6 +206,74 @@
                 "schema": { "$ref": "#/components/schemas/FriendsResponse" }
               }
             }
+          }
+        }
+      }
+    },
+    "/pets": {
+      "get": {
+        "tags": ["Pets"],
+        "summary": "Get all user's pets",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type":"array",
+                  "items": {
+                    "$ref":"#/components/schemas/Pet"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Pets"],
+        "summary": "Add a new pet",
+        "operationId": "addPet",
+        "requestBody":{
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {"$ref":"#/components/schemas/NewPet"}
+            }
+          }
+        },
+        "responses":{
+          "201": {
+            "description":"Successfully added a new pet",
+            "content":{
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/Pet"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pets/{id}": {
+      "delete": {
+        "tags": ["Pets"],
+        "summary": "Delete a pet by ID",
+        "operationId": "deletePet",
+        "parameters": {
+          "in": "path",
+          "name": "id",
+          "schema": {
+            "type":"string"
+          },
+          "required": true,
+          "description":"Id of the pet to delete"
+        },
+        "responses":{
+          "200": {
+            "description":"Pets was deleted successfully"
+          },
+          "404": {
+            "description": "Pet with this ID was not found"
           }
         }
       }
@@ -420,6 +489,78 @@
               "type": "string",
               "format":"email"
             }
+          }
+        }
+      },
+      "Pet": {
+        "type":"object",
+        "properties":{
+          "_id": {
+            "type":"string",
+            "description": "Pet's unique ID",
+            "example": "64c001b21a06f4a80fc18b5"
+          },
+          "name": {
+            "type": "string",
+            "description": "Pet's name",
+            "example": "Dogie"
+          },
+          "birthday": {
+            "type": "string",
+            "description": "Pet's birthday",
+            "example": "01.01.2001"
+          },
+          "type": {
+            "type": "string",
+            "description": "Breed",
+            "example": "Corgie"
+          },
+          "comments": {
+            "types": "string",
+            "description": "User's description about the dog"
+          },
+          "petAvatar": {
+            "type": "string",
+            "description": "Url",
+            "example": "https://res.cloudinary.com/dhh42ueby/image/upload/v1690307522/petAvatar/download_aw5p0t.png"
+          },
+          "owner": {
+            "type": "object",
+            "properties": {
+              "_id": {
+                "type": "string",
+                "description": "User's unique ID",
+                "example": "64c001f61a06f4a80fc18b5d"
+              },
+              "name": {
+                "type":"string",
+                "description": "User's name",
+                "example": "Bob"
+              }
+            }
+          }
+        }
+      },
+      "NewPet": {
+        "type": "object",
+        "required": [
+          "name", "birthday", "type"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the new pet",
+            "example":"Dogie"
+          },
+          "birthday": {
+            "type": "string",
+            "description": "Birthday of the new pet",
+            "example": "01.01.2001"
+          },
+          "type": {
+            "type": "string",
+            "description": "Breed",
+            "example": "Corgie"
           }
         }
       }
