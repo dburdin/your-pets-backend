@@ -7,8 +7,10 @@ const validateBody = (schema) => {
     if (error) {
       next(HttpError(400, error.message));
     }
-    const normalizedName = userNameHandler(req.body.name);
-    req.body = { ...req.body, name: normalizedName };
+
+    const name = req.body.name ? userNameHandler(req.body.name) : undefined;
+
+    req.body = { ...req.body, name };
     next();
   };
   return func;
