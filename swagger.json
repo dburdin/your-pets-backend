@@ -118,7 +118,7 @@
             "description": "Successful operation",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/UserResponse" }
+                "schema": { "$ref": "#/components/schemas/UserFullResponse" }
               }
             }
           },
@@ -397,32 +397,6 @@
           "updatedAt": "2023-07-24T12:34:40.613Z"
         }
       },
-      "UserResponse": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string",
-            "description": "User's name",
-            "format": "name",
-            "example": "John Dow"
-          },
-          "email": {
-            "type": "string",
-            "description": "User's email",
-            "format": "email"
-          },
-          "userId": {
-            "type": "string",
-            "description": "User's id",
-            "example": "321zssd43232436545474"
-          }
-        },
-        "example": {
-          "name": "John Dow",
-          "email": "user@example.com",
-          "userId": "321zssd43232436545474"
-        }
-      },
       "AuthenticationRequest": {
         "type": "object",
         "required": ["email", "password"],
@@ -449,7 +423,7 @@
             },
             "url": {
               "type": "string",
-              "description":"Company's website",
+              "description": "Company's website",
               "format": "uri"
             },
             "addressUrl": {
@@ -487,7 +461,7 @@
             },
             "email": {
               "type": "string",
-              "format":"email"
+              "format": "email"
             }
           }
         }

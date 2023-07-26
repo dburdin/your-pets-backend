@@ -38,8 +38,8 @@ const userSchema = new Schema(
     },
     city: { type: String },
     phone: { type: String },
-    myPets: [{ type: Schema.Types.ObjectId, ref: "pets" }],
-    favoritePets: [{ type: Schema.Types.ObjectId, ref: "pets" }],
+    myPets: [{ type: Schema.Types.ObjectId, ref: "pet" }],
+    favoritePets: [{ type: Schema.Types.ObjectId, ref: "pet" }],
     token: {
       type: String,
       default: "",
@@ -77,7 +77,7 @@ const updateSchema = Joi.object({
     "string.pattern.base": "Birth date format: DD-MM-YYYY",
   }),
   phone: Joi.string(),
-  city: Joi.string(),
+  city: Joi.string()
 });
 
 const schemas = {

@@ -61,10 +61,10 @@ const login = async (req, res) => {
   res.json({ token });
 };
 
-const getCurrent = (req, res) => {
-  const { email, name, _id } = req.user;
-
-  res.json({ email, name, _id });
+const getCurrent = async (req, res) => {
+  const { _id } = req.user;
+  const user = await User.findById(_id).populate("myPets");
+  res.json(user);
 };
 
 const logout = async (req, res) => {
