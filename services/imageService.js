@@ -49,6 +49,13 @@ class ImageService {
 
     const imageUrl = await cloudinary.uploader.upload(imageUri.content, {
       folder: folderName,
+      transformation: {
+        width: 250,
+        height: 250,
+        crop: "fill",
+        quality: 60,
+        radius: 40,
+      },
     });
     return imageUrl;
   }
