@@ -509,7 +509,7 @@
           },
           "action": {
             "types": "string",
-            "enum": ["sale", "in good hands"],
+            "enum": ["sale", "in good hands", "lost/found", "my pet"],
             "description": "Which group it belongs: sale, in good hands, my pet, lost/found"
           },
           "price": {
@@ -570,9 +570,13 @@
             "enum": ["MALE", "FEMALE"],
             "description": "Sex of the animal"
           },
+          "price": {
+            "types": "string",
+            "description": "Price for the animal"
+          },
           "action": {
             "types": "string",
-            "enum": ["sale", "in good hands"],
+            "enum": ["sale", "in good hands", "lost/found", "my pet"],
             "description": "Which group it belongs: sale, in good hands, my pet, lost/found"
           }
         }

@@ -38,12 +38,29 @@ const petSchema = new Schema(
     petAvatar: {
       type: String,
     },
-    sex: { type: String, enum: petEnum },
     action: {
       type: String,
       enum: actionTypeEnum,
+      required: [
+        true,
+        "Pick option: 'sell','lost/found', 'in good hands', 'my pet'",
+      ],
     },
-    price: { type: Number },
+    sex: {
+      type: String,
+      enum: petEnum,
+      // eslint-disable-next-line func-names
+      required: function() {
+        return this.action !== actionTypeEnum.MYPET;
+      },
+    },
+    price: {
+      type: Number,
+      // eslint-disable-next-line func-names
+      required: function() {
+        return this.action === actionTypeEnum.SELL;
+      },
+    },
     owner: {
       type: Types.ObjectId,
       ref: "user",
