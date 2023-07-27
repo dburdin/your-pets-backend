@@ -2,6 +2,7 @@ const { Schema, Types, model } = require("mongoose");
 const Joi = require("joi");
 
 const { handleMongooseError } = require("../helpers");
+const { petEnum, actionTypeEnum } = require("../constants/enums");
 
 const generalRegExp = /^[a-zA-Z]+$/;
 const dateRegExp = /^\d{2}-\d{2}-\d{4}$/;
@@ -15,6 +16,7 @@ const petSchema = new Schema(
       match: [generalRegExp, "Only English letters can be accepted"],
       required: [true, "Pet's name is required"],
     },
+    title: { type: String },
     birthday: {
       type: String,
       match: [dateRegExp, "Only DD-MM-YYYY format can be accepted"],
@@ -36,6 +38,12 @@ const petSchema = new Schema(
     petAvatar: {
       type: String,
     },
+    sex: { type: String, enum: petEnum },
+    action: {
+      type: String,
+      enum: actionTypeEnum,
+    },
+    price: { type: Number },
     owner: {
       type: Types.ObjectId,
       ref: "user",
@@ -53,7 +61,9 @@ const joiPetSchema = Joi.object({
     .max(16)
     .regex(generalRegExp, "Only English letters can be accepted")
     .required(),
-  birthday: Joi.string().regex(dateRegExp, "Only DD-MM-YYYY format can be accepted").required(),
+  birthday: Joi.string()
+    .regex(dateRegExp, "Only DD-MM-YYYY format can be accepted")
+    .required(),
   type: Joi.string()
     .min(2)
     .max(16)
@@ -61,6 +71,9 @@ const joiPetSchema = Joi.object({
     .required(),
   comments: Joi.string().min(1).max(120),
   petAvatar: Joi.string(),
+  sex: Joi.string().valid(...Object.values(petEnum)),
+  action: Joi.string().valid(...Object.values(actionTypeEnum)),
+  price: Joi.number().min(0),
 });
 
 const Pet = model("pet", petSchema);

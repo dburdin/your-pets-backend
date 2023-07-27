@@ -1,13 +1,10 @@
+const { actionTypeEnum } = require("../constants/enums");
 const { ctrlWrapper, HttpError } = require("../helpers");
 const { Pet } = require("../models/pet");
+const { User } = require("../models/user");
 
 const getAllPets = async (req, res) => {
-  const { _id: owner } = req.user;
-
-  const result = await Pet.find({ owner }, "-createdAt -updatedAt", {}).populate(
-    "owner",
-    "name date type comments petAvatar"
-  );
+  const result = await Pet.find().populate("owner", "-password -token");
 
   res.json(result);
 };
@@ -17,19 +14,29 @@ const addPet = async (req, res) => {
 
   const { file } = req;
 
-  const result = await Pet.create({
+  const newPet = await Pet.create({
     ...req.body,
     owner,
     petAvatar: file.path,
   });
 
-  res.status(201).json(result);
+  if (req.body.action === actionTypeEnum.MYPET) {
+    await User.findByIdAndUpdate(owner, {
+      $push: { myPets: newPet._id },
+    });
+  }
+  res.status(201).json(newPet);
 };
 
 const deletePet = async (req, res) => {
   const { id } = req.params;
 
   const result = await Pet.findByIdAndDelete(id);
+  if (result.action === actionTypeEnum.MYPET) {
+    await User.findByIdAndUpdate(req.user._id, {
+      $pull: { myPets: id },
+    });
+  }
 
   if (!result) {
     throw HttpError(404, `Pet with ${id} was not found`);

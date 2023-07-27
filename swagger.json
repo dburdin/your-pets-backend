@@ -21,7 +21,7 @@
       "description": "Authentication endpoints"
     },
     { "name": "Friends", "description": "Get all friends" },
-    {"name": "Pets", "description": "Pets endpoints"}
+    { "name": "Pets", "description": "Pets endpoints" }
   ],
   "paths": {
     "/auth/register": {
@@ -46,7 +46,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserResponse"
+                  "$ref": "#/components/schemas/UserFullResponse"
                 }
               }
             }
@@ -83,15 +83,8 @@
             "description": "Successful operation",
             "content": {
               "application/json": {
-                "type": "object",
-                "properties": {
-                  "token": {
-                    "type": "string",
-                    "description": "Access token"
-                  }
-                },
-                "example": {
-                  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0YmU1OWYwMTMY5MDE5NjQ3MiwiZXhwIjoxNjkwMjc5MjcyfQ.kHAw5zUtNTJVkdPyivaFCjSMpidIw"
+                "schema": {
+                  "$ref": "#/components/schemas/UserFullResponse"
                 }
               }
             }
@@ -213,16 +206,16 @@
     "/pets": {
       "get": {
         "tags": ["Pets"],
-        "summary": "Get all user's pets",
+        "summary": "Get all pets",
         "responses": {
           "200": {
             "description": "Successful operation",
             "content": {
               "application/json": {
                 "schema": {
-                  "type":"array",
+                  "type": "array",
                   "items": {
-                    "$ref":"#/components/schemas/Pet"
+                    "$ref": "#/components/schemas/Pet"
                   }
                 }
               }
@@ -234,20 +227,31 @@
         "tags": ["Pets"],
         "summary": "Add a new pet",
         "operationId": "addPet",
-        "requestBody":{
+        "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {"$ref":"#/components/schemas/NewPet"}
+              "schema": { "$ref": "#/components/schemas/newPet" }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "petAvatar": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
             }
           }
         },
-        "responses":{
+        "responses": {
           "201": {
-            "description":"Successfully added a new pet",
-            "content":{
+            "description": "Successfully added a new pet",
+            "content": {
               "application/json": {
-                "schema": {"$ref": "#/components/schemas/Pet"}
+                "schema": { "$ref": "#/components/schemas/Pet" }
               }
             }
           }
@@ -263,14 +267,14 @@
           "in": "path",
           "name": "id",
           "schema": {
-            "type":"string"
+            "type": "string"
           },
           "required": true,
-          "description":"Id of the pet to delete"
+          "description": "Id of the pet to delete"
         },
-        "responses":{
+        "responses": {
           "200": {
-            "description":"Pets was deleted successfully"
+            "description": "Pets was deleted successfully"
           },
           "404": {
             "description": "Pet with this ID was not found"
@@ -467,10 +471,10 @@
         }
       },
       "Pet": {
-        "type":"object",
-        "properties":{
+        "type": "object",
+        "properties": {
           "_id": {
-            "type":"string",
+            "type": "string",
             "description": "Pet's unique ID",
             "example": "64c001b21a06f4a80fc18b5"
           },
@@ -478,6 +482,11 @@
             "type": "string",
             "description": "Pet's name",
             "example": "Dogie"
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of Notice",
+            "example": "Nice dog, love kids"
           },
           "birthday": {
             "type": "string",
@@ -493,6 +502,20 @@
             "types": "string",
             "description": "User's description about the dog"
           },
+          "sex": {
+            "types": "string",
+            "enum": ["MALE", "FEMALE"],
+            "description": "Sex of the animal"
+          },
+          "action": {
+            "types": "string",
+            "enum": ["sale", "in good hands"],
+            "description": "Which group it belongs: sale, in good hands, my pet, lost/found"
+          },
+          "price": {
+            "types": "string",
+            "description": "Price"
+          },
           "petAvatar": {
             "type": "string",
             "description": "Url",
@@ -507,7 +530,7 @@
                 "example": "64c001f61a06f4a80fc18b5d"
               },
               "name": {
-                "type":"string",
+                "type": "string",
                 "description": "User's name",
                 "example": "Bob"
               }
@@ -515,26 +538,42 @@
           }
         }
       },
-      "NewPet": {
+      "newPet": {
         "type": "object",
-        "required": [
-          "name", "birthday", "type"
-        ],
         "properties": {
           "name": {
             "type": "string",
-            "description": "Name of the new pet",
-            "example":"Dogie"
+            "description": "Pet's name",
+            "example": "Dogie"
+          },
+          "title": {
+            "type": "string",
+            "description": "Title of Notice",
+            "example": "Nice dog, love kids"
           },
           "birthday": {
             "type": "string",
-            "description": "Birthday of the new pet",
+            "description": "Pet's birthday",
             "example": "01.01.2001"
           },
           "type": {
             "type": "string",
             "description": "Breed",
             "example": "Corgie"
+          },
+          "comments": {
+            "types": "string",
+            "description": "User's description about the dog"
+          },
+          "sex": {
+            "types": "string",
+            "enum": ["MALE", "FEMALE"],
+            "description": "Sex of the animal"
+          },
+          "action": {
+            "types": "string",
+            "enum": ["sale", "in good hands"],
+            "description": "Which group it belongs: sale, in good hands, my pet, lost/found"
           }
         }
       }

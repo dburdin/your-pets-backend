@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const avatarFolder = require("../constants/avatarFolders");
+const { avatarFolder } = require("../constants/enums");
 
 const { ctrlWrapper, HttpError } = require("../helpers");
 const { User } = require("../models/user");
@@ -20,7 +20,7 @@ const register = async (req, res) => {
   )}/avatars/defaultAvatar.png`;
   const hashPassword = await bcrypt.hash(password, 10);
 
-  const newUser = await User.create({
+  let newUser = await User.create({
     ...req.body,
     password: hashPassword,
     avatarURL,
@@ -32,13 +32,9 @@ const register = async (req, res) => {
 
   const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
 
-  await User.findByIdAndUpdate(newUser._id, { token });
+  newUser = await User.findByIdAndUpdate(newUser._id, { token }, { new: true });
 
-  res.status(201).json({
-    email: newUser.email,
-    id: newUser._id,
-    token,
-  });
+  res.status(201).json(newUser);
 };
 
 const login = async (req, res) => {
@@ -56,14 +52,21 @@ const login = async (req, res) => {
   };
 
   const token = jwt.sign(payload, SECRET_KEY, { expiresIn: "23h" });
-  await User.findByIdAndUpdate(user._id, { token });
+  const updatedUser = await User.findByIdAndUpdate(
+    user._id,
+    {
+      token,
+    },
+    { new: true }
+  ).populate(["myPets", "favoritePets"]);
 
-  res.json({ token });
+  res.json(updatedUser);
 };
 
 const getCurrent = async (req, res) => {
   const { _id } = req.user;
-  const user = await User.findById(_id).populate("myPets");
+
+  const user = await User.findById(_id).populate(["myPets", "favoritePets"]);
   res.json(user);
 };
 
