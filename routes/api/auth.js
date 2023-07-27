@@ -1,6 +1,4 @@
 const express = require("express");
-const avatarFolder = require("../../constants/avatarFolders");
-
 const {
   validateBody,
   authenticate,
@@ -8,6 +6,7 @@ const {
 } = require("../../middlewares");
 const { schemas } = require("../../models/user");
 const ctrl = require("../../controllers/auth");
+const { avatarFolders } = require("../../constants/enums");
 
 const router = express.Router();
 
@@ -22,7 +21,7 @@ router.post("/logout", authenticate, ctrl.logout);
 router.patch(
   "/updateUser",
   authenticate,
-  uploadImage(avatarFolder.userAvatar),
+  uploadImage(avatarFolders.userAvatar),
   validateBody(schemas.updateSchema),
   ctrl.updateUser
 );
