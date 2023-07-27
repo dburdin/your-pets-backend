@@ -1,6 +1,6 @@
-const Jimp = require("jimp");
+const Jimp = require('jimp');
 
-const imageResize = async (path) => {
+const imageResize = async path => {
   const img = await Jimp.read(path);
 
   await img.resize(250, 250);
