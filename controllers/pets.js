@@ -1,7 +1,8 @@
-const { actionTypeEnum } = require("../constants/enums");
+const { actionTypeEnum, avatarFolders } = require("../constants/enums");
 const { ctrlWrapper, HttpError } = require("../helpers");
 const { Pet } = require("../models/pet");
 const { User } = require("../models/user");
+const ImageService = require("../services/imageService");
 
 const getAllPets = async (req, res) => {
   const result = await Pet.find().populate("owner", "-password -token");
@@ -11,13 +12,19 @@ const getAllPets = async (req, res) => {
 
 const addPet = async (req, res) => {
   const { _id: owner } = req.user;
-
   const { file } = req;
+
+  if (file) {
+    if (file.size > 3 * 1024 * 1024) {
+      throw HttpError(400, "file size should be less then 3 mb");
+    }
+    const { url } = await ImageService.save(req, avatarFolders.petAvatar);
+    req.body.petAvatar = url;
+  }
 
   const newPet = await Pet.create({
     ...req.body,
     owner,
-    petAvatar: file.path,
   });
 
   if (req.body.action === actionTypeEnum.MYPET) {
