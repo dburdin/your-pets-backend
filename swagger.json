@@ -215,7 +215,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Pet"
+                    "$ref": "#/components/schemas/PetResponse"
                   }
                 }
               }
@@ -231,7 +231,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/newPet" }
+              "schema": { "$ref": "#/components/schemas/PetRequest" }
             },
             "multipart/form-data": {
               "schema": {
@@ -251,7 +251,7 @@
             "description": "Successfully added a new pet",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/Pet" }
+                "schema": { "$ref": "#/components/schemas/PetResponse" }
               }
             }
           }
@@ -382,23 +382,8 @@
             "description": "Access token",
             "example": "iJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjTMzNGRkNDJhMjA1YmNkOSIsImlhdCI6MTY5MDIwMjA4MCwiZXhwIjoxNjkwMjg0ODgwfQ.tMnqxlro4JMvOAMeH2xitW7KVIrz07Ej-n6ES-T5vHg"
           },
-          "myPets": { "type": "array", "items": { "type": "string" } },
-          "favoritePets": { "type": "array", "items": { "type": "string" } }
-        },
-        "example": {
-          "_id": "64be59f01334d2a205bcd9",
-          "name": "John Dow",
-          "password": "",
-          "email": "example@example.com",
-          "birthDate": "00-00-0000",
-          "city": "Lviv",
-          "phone": "+380501234567",
-          "avatarURL": "http://localhost:8000/avatars/defaultAvatar.png",
-          "myPets": [],
-          "favoritePets": [],
-          "token": "iJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjTMzNGRkNDJhMjA1YmNkOSIsImlhdCI6MTY5MDIwMjA4MCwiZXhwIjoxNjkwMjg0ODgwfQ.tMnqxlro4JMvOAMeH2xitW7KVIrz07Ej-n6ES-T5vHg",
-          "createdAt": "2023-07-24T11:01:04.419Z",
-          "updatedAt": "2023-07-24T12:34:40.613Z"
+          "myPets": { "type": "array", "items": { "$ref": "#/components/schemas/PetResponse" } },
+          "favoritePets": { "type": "array", "items": { "$ref": "#/components/schemas/PetResponse" } }
         }
       },
       "AuthenticationRequest": {
@@ -470,7 +455,7 @@
           }
         }
       },
-      "Pet": {
+      "PetResponse": {
         "type": "object",
         "properties": {
           "_id": {
@@ -516,29 +501,21 @@
             "types": "string",
             "description": "Price"
           },
+          "location": {
+            "types": "string",
+            "description": "Where pet is located"
+          },
           "petAvatar": {
             "type": "string",
             "description": "Url",
             "example": "https://res.cloudinary.com/dhh42ueby/image/upload/v1690307522/petAvatar/download_aw5p0t.png"
           },
           "owner": {
-            "type": "object",
-            "properties": {
-              "_id": {
-                "type": "string",
-                "description": "User's unique ID",
-                "example": "64c001f61a06f4a80fc18b5d"
-              },
-              "name": {
-                "type": "string",
-                "description": "User's name",
-                "example": "Bob"
-              }
-            }
+            "$ref": "#/components/schemas/UserFullResponse"
           }
         }
       },
-      "newPet": {
+      "PetRequest": {
         "type": "object",
         "properties": {
           "name": {
@@ -571,6 +548,10 @@
             "description": "Sex of the animal"
           },
           "price": {
+            "types": "string",
+            "description": "Price for the animal"
+          },
+          "location": {
             "types": "string",
             "description": "Price for the animal"
           },

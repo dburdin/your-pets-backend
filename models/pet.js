@@ -54,6 +54,13 @@ const petSchema = new Schema(
         return this.action !== actionTypeEnum.MYPET;
       },
     },
+    location: {
+      type: String,
+      // eslint-disable-next-line func-names
+      required: function() {
+        return this.action !== actionTypeEnum.MYPET;
+      },
+    },
     price: {
       type: Number,
       // eslint-disable-next-line func-names
@@ -87,6 +94,7 @@ const joiPetSchema = Joi.object({
     .regex(generalRegExp, "Only English letters can be accepted")
     .required(),
   comments: Joi.string().min(1).max(120),
+  location: Joi.string(),
   petAvatar: Joi.string(),
   sex: Joi.string().valid(...Object.values(petEnum)),
   action: Joi.string().valid(...Object.values(actionTypeEnum)),

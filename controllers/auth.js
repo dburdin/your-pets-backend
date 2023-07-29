@@ -66,7 +66,7 @@ const login = async (req, res) => {
 const getCurrent = async (req, res) => {
   const { _id } = req.user;
 
-  const user = await User.findById(_id).populate(["myPets", "favoritePets"]);
+  const user = await User.findById(_id).populate(["myPets"]);
   res.json(user);
 };
 
