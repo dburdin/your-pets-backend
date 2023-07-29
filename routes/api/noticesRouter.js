@@ -1,48 +1,76 @@
-const express = require('express');
+const express = require("express");
 
-const noticesRouter = express.Router();
+const router = express.Router();
 
-const noticesMiddlewares = require('../../middlewares/noticesMiddlewares');
-const noticesController = require('../../controllers/noticesController');
-const ImageService = require('../../services/imageService');
-const { isValidId, authenticate } = require('../../middlewares');
+const noticesMiddlewares = require("../../middlewares/noticesMiddlewares");
+const noticesController = require("../../controllers/notices");
+const ImageService = require("../../services/imageService");
+const {
+  isValidId,
+  authenticate,
+  uploadImage,
+  validateBody,
+} = require("../../middlewares");
+const { avatarFolders } = require("../../constants/enums");
+const { joiPetSchema } = require("../../models/pet");
+const ctrlNotices = require("../../controllers/notices");
+const ctrlPets = require("../../controllers/pets");
 
-noticesRouter.route('/:category').get(noticesController.listNoticesByCategory);
+router.get("/:id", authenticate, isValidId, ctrlNotices.getById);
 
-noticesRouter.route('/card/:id').get(isValidId, noticesController.getNoticeById);
+router.get("/user/ads", authenticate, ctrlNotices.getMyAds);
 
-noticesRouter.route('/title/search/:category').get(noticesController.searcNoticeByTitle);
+router.post(
+  "/",
+  authenticate,
+  uploadImage(avatarFolders.petAvatar),
+  validateBody(joiPetSchema),
+  ctrlPets.addPet
+);
 
-noticesRouter.use(authenticate);
+router.delete("/:id", authenticate, isValidId, ctrlPets.deletePet);
 
-noticesRouter
-  .route('/')
-  .post(
-    [ImageService.upload('photo'), noticesMiddlewares.checkAddNotice],
-    noticesController.addOwnNotice
-  );
+// router.route("/card/:id").get(isValidId, noticesController.getNoticeById);
 
-noticesRouter
-  .route('/:id/favorite')
-  .post(
-    [isValidId, noticesMiddlewares.checkAddNoticeToFavorite],
-    noticesController.addNoticeToFavorite
-  );
+// router
+//   .route("/title/search/:category")
+//   .get(noticesController.searcNoticeByTitle);
 
-noticesRouter
-  .route('/:id/favorite')
-  .delete(
-    [isValidId, noticesMiddlewares.checkDelNoticeFromFavorite],
-    noticesController.removeNoticeFromFavorite
-  );
+// router.use(authenticate);
 
-noticesRouter
-  .route('/:id')
-  .delete([isValidId, noticesMiddlewares.checkRemoveOwnNotice], noticesController.removeOwnNotice);
+// router
+//   .route("/")
+//   .post(
+//     [ImageService.upload("photo"), noticesMiddlewares.checkAddNotice],
+//     noticesController.addOwnNotice
+//   );
 
-noticesRouter.route('/user/own').get(noticesController.listUserOwnNotices);
-noticesRouter.route('/user/favorite').get(noticesController.listFavoriteNotices);
-noticesRouter.route('/title/favorite').get(noticesController.searchFavoriteNoticeByTitle);
-noticesRouter.route('/title/own').get(noticesController.searchUserNoticeByTitle);
+// router
+//   .route("/:id/favorite")
+//   .post(
+//     [isValidId, noticesMiddlewares.checkAddNoticeToFavorite],
+//     noticesController.addNoticeToFavorite
+//   );
 
-module.exports = noticesRouter;
+// router
+//   .route("/:id/favorite")
+//   .delete(
+//     [isValidId, noticesMiddlewares.checkDelNoticeFromFavorite],
+//     noticesController.removeNoticeFromFavorite
+//   );
+
+// router
+//   .route("/:id")
+//   .delete(
+//     [isValidId, noticesMiddlewares.checkRemoveOwnNotice],
+//     noticesController.removeOwnNotice
+//   );
+
+// router.route("/user/own").get(noticesController.listUserOwnNotices);
+// router.route("/user/favorite").get(noticesController.listFavoriteNotices);
+// router
+//   .route("/title/favorite")
+//   .get(noticesController.searchFavoriteNoticeByTitle);
+// router.route("/title/own").get(noticesController.searchUserNoticeByTitle);
+
+module.exports = router;
