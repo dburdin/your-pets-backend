@@ -1,8 +1,5 @@
-const { actionTypeEnum, avatarFolders } = require("../constants/enums");
-const { ctrlWrapper, HttpError } = require("../helpers");
+const { ctrlWrapper } = require("../helpers");
 const { Pet } = require("../models/pet");
-const { User } = require("../models/user");
-const ImageService = require("../services/imageService");
 
 const getMyAds = async (req, res) => {
   const { _id } = req.user;

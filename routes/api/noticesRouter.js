@@ -2,9 +2,6 @@ const express = require("express");
 
 const router = express.Router();
 
-const noticesMiddlewares = require("../../middlewares/noticesMiddlewares");
-const noticesController = require("../../controllers/notices");
-const ImageService = require("../../services/imageService");
 const {
   isValidId,
   authenticate,
