@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { avatarFolder } = require("../constants/enums");
+const { avatarFolders } = require("../constants/enums");
 
 const { ctrlWrapper, HttpError } = require("../helpers");
 const { User } = require("../models/user");
@@ -85,7 +85,7 @@ const updateUser = async (req, res) => {
     if (file.size > 3 * 1024 * 1024) {
       throw HttpError(400, "file size should be less then 3 mb");
     }
-    const { url } = await ImageService.save(req, avatarFolder.userAvatar);
+    const { url } = await ImageService.save(req, avatarFolders.userAvatar);
     req.body.avatarURL = url;
   }
 
