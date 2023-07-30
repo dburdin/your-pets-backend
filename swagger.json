@@ -207,6 +207,7 @@
       "get": {
         "tags": ["Pets"],
         "summary": "Get all pets",
+        "security": [{ "Bearer": [] }],
         "responses": {
           "200": {
             "description": "Successful operation",
@@ -226,12 +227,29 @@
       "post": {
         "tags": ["Pets"],
         "summary": "Add a new pet",
+        "security": [{ "Bearer": [] }],
         "operationId": "addPet",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/PetRequest" }
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/lost found"
+                  },
+                  {
+                    "$ref": "#/components/schemas/sell"
+                  },
+                  {
+                    "$ref": "#/components/schemas/in good hands"
+                  },
+                  {
+                    "$ref": "#/components/schemas/my pet"
+                  }
+                ],
+                "discriminator": { "propertyName": "action" }
+              }
             },
             "multipart/form-data": {
               "schema": {
@@ -262,16 +280,22 @@
       "delete": {
         "tags": ["Pets"],
         "summary": "Delete a pet by ID",
-        "operationId": "deletePet",
-        "parameters": {
-          "in": "path",
-          "name": "id",
-          "schema": {
-            "type": "string"
-          },
-          "required": true,
-          "description": "Id of the pet to delete"
-        },
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Id of the pet to delete"
+          }
+        ],
         "responses": {
           "200": {
             "description": "Pets was deleted successfully"
@@ -382,8 +406,14 @@
             "description": "Access token",
             "example": "iJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjTMzNGRkNDJhMjA1YmNkOSIsImlhdCI6MTY5MDIwMjA4MCwiZXhwIjoxNjkwMjg0ODgwfQ.tMnqxlro4JMvOAMeH2xitW7KVIrz07Ej-n6ES-T5vHg"
           },
-          "myPets": { "type": "array", "items": { "$ref": "#/components/schemas/PetResponse" } },
-          "favoritePets": { "type": "array", "items": { "$ref": "#/components/schemas/PetResponse" } }
+          "myPets": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PetResponse" }
+          },
+          "favoritePets": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/PetResponse" }
+          }
         }
       },
       "AuthenticationRequest": {
@@ -489,13 +519,13 @@
           },
           "sex": {
             "types": "string",
-            "enum": ["MALE", "FEMALE"],
+            "enum": ["male", "female"],
             "description": "Sex of the animal"
           },
           "action": {
             "types": "string",
-            "enum": ["sale", "in good hands", "lost/found", "my pet"],
-            "description": "Which group it belongs: sale, in good hands, my pet, lost/found"
+            "enum": ["sell", "in good hands", "lost/found", "my pet"],
+            "description": "Which group it belongs: sell, in good hands, my pet, lost/found"
           },
           "price": {
             "types": "string",
@@ -517,21 +547,17 @@
       },
       "PetRequest": {
         "type": "object",
+        "required": ["name", "birthday", "type", "action"],
         "properties": {
           "name": {
             "type": "string",
             "description": "Pet's name",
             "example": "Dogie"
           },
-          "title": {
-            "type": "string",
-            "description": "Title of Notice",
-            "example": "Nice dog, love kids"
-          },
           "birthday": {
             "type": "string",
             "description": "Pet's birthday",
-            "example": "01.01.2001"
+            "example": "01-01-2001"
           },
           "type": {
             "type": "string",
@@ -542,25 +568,102 @@
             "types": "string",
             "description": "User's description about the dog"
           },
-          "sex": {
-            "types": "string",
-            "enum": ["MALE", "FEMALE"],
-            "description": "Sex of the animal"
-          },
-          "price": {
-            "types": "string",
-            "description": "Price for the animal"
-          },
-          "location": {
-            "types": "string",
-            "description": "Price for the animal"
-          },
+
           "action": {
             "types": "string",
-            "enum": ["sale", "in good hands", "lost/found", "my pet"],
-            "description": "Which group it belongs: sale, in good hands, my pet, lost/found"
+            "enum": ["sell", "in good hands", "lost/found", "my pet"],
+            "description": "Which group it belongs: sell, in good hands, my pet, lost/found",
+            "example": "in good hands"
           }
+        },
+        "discriminator": {
+          "propertyName": "action"
         }
+      },
+      "in good hands": {
+        "allOf": [
+          { "$ref": "#/components/schemas/PetRequest" },
+          {
+            "type": "object",
+            "required": ["title", "sex", "location"],
+            "properties": {
+              "title": {
+                "type": "string",
+                "description": "Title of Notice",
+                "example": "Nice dog, love kids"
+              },
+              "sex": {
+                "types": "string",
+                "enum": ["male", "female"],
+                "description": "Sex of the animal",
+                "example":"male"
+              },
+              "location": {
+                "types": "string",
+                "description": "Price for the animal"
+              }
+            }
+          }
+        ]
+      },
+      "lost found": {
+        "allOf": [
+          { "$ref": "#/components/schemas/PetRequest" },
+          {
+            "type": "object",
+            "required": ["title", "sex", "location"],
+            "properties": {
+              "title": {
+                "type": "string",
+                "description": "Title of Notice",
+                "example": "Nice dog, love kids"
+              },
+              "sex": {
+                "types": "string",
+                "enum": ["male", "female"],
+                "description": "Sex of the animal",
+                "example": "male"
+              },
+              "location": {
+                "types": "string",
+                "description": "Price for the animal"
+              }
+            }
+          }
+        ]
+      },
+      "sell": {
+        "allOf": [
+          { "$ref": "#/components/schemas/PetRequest" },
+          {
+            "type": "object",
+            "required": ["title", "sex", "location"],
+            "properties": {
+              "title": {
+                "type": "string",
+                "description": "Title of Notice",
+                "example": "Nice dog, love kids"
+              },
+              "sex": {
+                "types": "string",
+                "enum": ["male", "female"],
+                "description": "Sex of the animal",
+                "example": "male"
+              },
+              "location": {
+                "types": "string",
+                "description": "Price for the animal"
+              },
+              "price": {
+                "types": "string",
+                "description": "Price for the animal"
+              }
+            }
+          }
+        ]
+      },
+      "my pet": {
+        "allOf": [{ "$ref": "#/components/schemas/PetRequest" }]
       }
     },
     "securitySchemes": {

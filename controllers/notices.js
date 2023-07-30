@@ -1,7 +1,32 @@
-const { ctrlWrapper } = require("../helpers");
-const { Pet } = require("../models/pet");
+const { ctrlWrapper, HttpError } = require("../helpers");
+const { Pet, User } = require("../models");
 
-const getMyAds = async (req, res) => {
+const getNotices = async (req, res) => {
+  const { category, searchQuery = "", page = 1, limit = 10 } = req.query;
+  const skip = (page - 1) * limit;
+  const action = category ? { action: category } : null;
+
+  const data = await Pet.find({
+    $and: [
+      {
+        ...Object.entries(req.query).reduce((acc, [key, value]) => {
+          acc[key] = { $regex: new RegExp(value, "i") };
+          return acc;
+        }, {}),
+        ...action,
+        title: { $regex: new RegExp(searchQuery, "i") },
+      },
+      { action: { $ne: "my pet" } },
+    ],
+  })
+    .skip(skip)
+    .limit(limit)
+    .populate("owner", "-myPets -favoritePets -password -token");
+
+  res.json(data);
+};
+
+const getMyNotices = async (req, res) => {
   const { _id } = req.user;
   const result = await Pet.find({
     $and: [{ owner: _id }, { action: { $ne: "my pet" } }],
@@ -12,181 +37,57 @@ const getMyAds = async (req, res) => {
 
 const getById = async (req, res) => {
   const { id } = req.params;
+  console.log(id);
   const pet = await Pet.findById(id);
 
   res.json(pet);
 };
 
-module.exports = {
-  getMyAds: ctrlWrapper(getMyAds),
-  getById: ctrlWrapper(getById),
+const getFavorites = async (req, res) => {
+  const { _id } = req.user;
+  const { favoritePets } = await User.findById(_id).populate("favoritePets");
+  res.json(favoritePets);
 };
 
-// exports.addOwnNotice = ctrlWrapper(async (req, res) => {
-//   const { _id: userId } = req.user;
-//   const { body, file } = req;
+const addFavorite = async (req, res) => {
+  const { id } = req.params;
+  const { _id: owner, favoritePets } = req.user;
 
-//   if (file) {
-//     const { path } = req.file;
+  if (favoritePets.includes(id)) {
+    throw HttpError(409, "Pet is already in favorites");
+  }
 
-//     const fileName = path.split('/');
-//     console.log(fileName);
-//     const length = fileName.length;
+  await User.findByIdAndUpdate(owner, {
+    $push: { favoritePets: id },
+  });
 
-//     body.photo = cloudinary.url(fileName[length - 1], {
-//       width: 200,
-//       height: 200,
-//       gravity: 'faces',
-//       crop: 'fill',
-//       quality: 'auto',
-//       fetch_format: 'jpg',
-//     });
-//   }
+  res.json({ message: `Pet was added to favorites of ${req.user.name}` });
+};
 
-//   const notice = await noticesService.addOwnNotice(userId, body);
+const deleteFavorite = async (req, res) => {
+  const { id } = req.params;
+  const { favoritePets } = req.user;
 
-//   res.status(200).json({ notice });
-// });
+  if (!favoritePets.includes(id)) {
+    throw HttpError(409, `Pet with ${id} was not found`);
+  }
 
-// exports.addNoticeToFavorite = ctrlWrapper(async (req, res, next) => {
-//   const { _id: userId } = req.user;
-//   const { id: noticeId } = req.params;
+  const result = await User.findByIdAndUpdate(req.user._id, {
+    $pull: { favoritePets: id },
+  });
 
-//   const notice = await noticesService.addNoticeToFavorite(userId, noticeId);
+  if (!result) {
+    throw HttpError(404, `Pet with ${id} was not found`);
+  }
 
-//   res.status(200).json({
-//     userId: userId,
-//     noticeId: notice._id,
-//   });
-// });
+  res.json({ message: "Pet was removed from favorites" });
+};
 
-// exports.removeNoticeFromFavorite = ctrlWrapper(async (req, res, next) => {
-//   const { _id: userId } = req.user;
-//   const { id: noticeId } = req.params;
-
-//   await noticesService.removeNoticeFromFavorite(userId, noticeId);
-
-//   res.status(200).json({ message: 'Notices was deleted from favorites' });
-// });
-
-// exports.removeOwnNotice = ctrlWrapper(async (req, res, next) => {
-//   const { _id: userId } = req.user;
-
-//   const { id: noticeId } = req.params;
-
-//   await noticesService.removeOwnNotice(userId, noticeId);
-
-//   res.status(200).json({ message: 'Notice was deleted' });
-// });
-
-// exports.listNoticesByCategory = ctrlWrapper(async (req, res, next) => {
-//   const { category } = req.params;
-//   let { page = 1, limit = 12 } = req.query;
-
-//   page = +page;
-//   limit = +limit;
-
-//   limit = limit > 12 ? 12 : limit;
-//   const skip = (page - 1) * limit;
-
-//   const notices = await noticesService.listNoticesByCategory(category, {
-//     skip,
-//     limit,
-//   });
-
-//   res.status(200).json({ notices, page, per_page: limit, total: notices.length });
-// });
-
-// exports.getNoticeById = ctrlWrapper(async (req, res) => {
-//   const { id: noticeId } = req.params;
-
-//   const notice = await noticesService.getNoticeById(noticeId);
-
-//   res.status(200).json({ notice });
-// });
-
-// exports.listUserOwnNotices = ctrlWrapper(async (req, res) => {
-//   const { _id: userId } = req.user;
-//   let { page = 1, limit = 12 } = req.query;
-
-//   page = +page;
-//   limit = +limit;
-
-//   limit = limit > 12 ? 12 : limit;
-//   const skip = (page - 1) * limit;
-
-//   const notices = await noticesService.listUserOwnNotices(userId, {
-//     skip,
-//     limit,
-//   });
-
-//   res.status(200).json({ notices, page, per_page: limit, total: notices.length });
-// });
-
-// exports.listFavoriteNotices = ctrlWrapper(async (req, res) => {
-//   const { _id: userId } = req.user;
-//   let { page = 1, limit = 12 } = req.query;
-
-//   page = +page;
-//   limit = +limit;
-
-//   limit = limit > 12 ? 12 : limit;
-
-//   const skip = (page - 1) * limit;
-
-//   const notices = await noticesService.listFavoriteNotices(userId, {
-//     skip,
-//     limit,
-//   });
-
-//   res.status(200).json({ notices, page, per_page: limit, total: notices.length });
-// });
-
-// exports.searcNoticeByTitle = ctrlWrapper(async (req, res) => {
-//   let { search = '', page = 1, limit = 12 } = req.query;
-//   const { category } = req.params;
-
-//   page = +page;
-//   limit = +limit;
-
-//   limit = limit > 12 ? 12 : limit;
-
-//   const skip = (page - 1) * limit;
-
-//   const notices = await noticesService.searcNoticeByTitle({ search, category }, { skip, limit });
-
-//   res.status(200).json({ notices, page, per_page: limit, total: notices.length });
-// });
-
-// exports.searchFavoriteNoticeByTitle = ctrlWrapper(async (req, res) => {
-//   let { page = 1, limit = 12, search = '' } = req.query;
-//   const { _id: userId } = req.user;
-
-//   page = +page;
-//   limit = +limit;
-
-//   limit = limit > 12 ? 12 : limit;
-//   const skip = (page - 1) * limit;
-
-//   const notices = await noticesService.searchFavoriteNoticeByTitle(
-//     { search, userId },
-//     { skip, limit }
-//   );
-
-//   res.status(200).json({ notices, page, per_page: limit, total: notices.length });
-// });
-
-// exports.searchUserNoticeByTitle = ctrlWrapper(async (req, res) => {
-//   const { _id: userId } = req.user;
-//   let { page = 1, limit = 12, search = '' } = req.query;
-
-//   page = +page;
-//   limit = +limit;
-
-//   limit = limit > 12 ? 12 : limit;
-//   const skip = (page - 1) * limit;
-
-//   const notices = await noticesService.searchUserNoticeByTitle({ search, userId }, { skip, limit });
-
-//   res.status(200).json({ notices, page, per_page: limit, total: notices.length });
-// });
+module.exports = {
+  getNotices: ctrlWrapper(getNotices),
+  getMyNotices: ctrlWrapper(getMyNotices),
+  getById: ctrlWrapper(getById),
+  getFavorites: ctrlWrapper(getFavorites),
+  addFavorite: ctrlWrapper(addFavorite),
+  deleteFavorite: ctrlWrapper(deleteFavorite),
+};
