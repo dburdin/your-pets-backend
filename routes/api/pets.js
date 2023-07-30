@@ -14,8 +14,6 @@ const { avatarFolders } = require("../../constants/enums");
 
 const router = express.Router();
 
-router.get("/", authenticate, ctrl.getAllPets);
-
 router.post(
   "/",
   authenticate,
