@@ -3,8 +3,9 @@ const jwt = require("jsonwebtoken");
 const { avatarFolders } = require("../constants/enums");
 
 const { ctrlWrapper, HttpError } = require("../helpers");
-const { User } = require("../models/user");
+
 const ImageService = require("../services/imageService");
+const { User } = require("../models");
 
 const { SECRET_KEY } = process.env;
 

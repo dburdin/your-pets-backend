@@ -16,7 +16,13 @@ const petSchema = new Schema(
       match: [generalRegExp, "Only English letters can be accepted"],
       required: [true, "Pet's name is required"],
     },
-    title: { type: String },
+    title: {
+      type: String,
+      // eslint-disable-next-line func-names
+      required: function() {
+        return this.action !== actionTypeEnum.MYPET;
+      },
+    },
     birthday: {
       type: String,
       match: [dateRegExp, "Only DD-MM-YYYY format can be accepted"],
@@ -96,6 +102,7 @@ const joiPetSchema = Joi.object({
   comments: Joi.string().min(1).max(120),
   location: Joi.string(),
   petAvatar: Joi.string(),
+  title: Joi.string(),
   sex: Joi.string().valid(...Object.values(petEnum)),
   action: Joi.string().valid(...Object.values(actionTypeEnum)),
   price: Joi.number().min(0),

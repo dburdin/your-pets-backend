@@ -13,9 +13,19 @@ const { joiPetSchema } = require("../../models/pet");
 const ctrlNotices = require("../../controllers/notices");
 const ctrlPets = require("../../controllers/pets");
 
-router.get("/:id", authenticate, isValidId, ctrlNotices.getById);
+router.get("/", ctrlNotices.getNotices);
 
-router.get("/user/ads", authenticate, ctrlNotices.getMyAds);
+router.get("/favorites", authenticate, ctrlNotices.getFavorites);
+router.post("/favorites/:id", authenticate, isValidId, ctrlNotices.addFavorite);
+router.delete(
+  "/favorites/:id",
+  authenticate,
+  isValidId,
+  ctrlNotices.deleteFavorite
+);
+
+router.get("/:id", authenticate, isValidId, ctrlNotices.getById);
+router.get("/user/notices", authenticate, ctrlNotices.getMyNotices);
 
 router.post(
   "/",
@@ -26,48 +36,5 @@ router.post(
 );
 
 router.delete("/:id", authenticate, isValidId, ctrlPets.deletePet);
-
-// router.route("/card/:id").get(isValidId, noticesController.getNoticeById);
-
-// router
-//   .route("/title/search/:category")
-//   .get(noticesController.searcNoticeByTitle);
-
-// router.use(authenticate);
-
-// router
-//   .route("/")
-//   .post(
-//     [ImageService.upload("photo"), noticesMiddlewares.checkAddNotice],
-//     noticesController.addOwnNotice
-//   );
-
-// router
-//   .route("/:id/favorite")
-//   .post(
-//     [isValidId, noticesMiddlewares.checkAddNoticeToFavorite],
-//     noticesController.addNoticeToFavorite
-//   );
-
-// router
-//   .route("/:id/favorite")
-//   .delete(
-//     [isValidId, noticesMiddlewares.checkDelNoticeFromFavorite],
-//     noticesController.removeNoticeFromFavorite
-//   );
-
-// router
-//   .route("/:id")
-//   .delete(
-//     [isValidId, noticesMiddlewares.checkRemoveOwnNotice],
-//     noticesController.removeOwnNotice
-//   );
-
-// router.route("/user/own").get(noticesController.listUserOwnNotices);
-// router.route("/user/favorite").get(noticesController.listFavoriteNotices);
-// router
-//   .route("/title/favorite")
-//   .get(noticesController.searchFavoriteNoticeByTitle);
-// router.route("/title/own").get(noticesController.searchUserNoticeByTitle);
 
 module.exports = router;
