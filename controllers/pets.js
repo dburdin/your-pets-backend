@@ -4,12 +4,6 @@ const { Pet, User } = require("../models");
 
 const ImageService = require("../services/imageService");
 
-const getAllPets = async (req, res) => {
-  const result = await Pet.find().populate("owner", "-password -token");
-
-  res.json(result);
-};
-
 const addPet = async (req, res) => {
   const { _id: owner } = req.user;
   const { file } = req;
@@ -59,7 +53,6 @@ const deletePet = async (req, res) => {
 };
 
 module.exports = {
-  getAllPets: ctrlWrapper(getAllPets),
   addPet: ctrlWrapper(addPet),
   deletePet: ctrlWrapper(deletePet),
 };

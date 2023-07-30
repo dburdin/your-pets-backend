@@ -21,7 +21,8 @@
       "description": "Authentication endpoints"
     },
     { "name": "Friends", "description": "Get all friends" },
-    { "name": "Pets", "description": "Pets endpoints" }
+    { "name": "Pets", "description": "Pets endpoints" },
+    { "name": "Notices", "description": "Notices of Pets endpoints" }
   ],
   "paths": {
     "/auth/register": {
@@ -204,26 +205,6 @@
       }
     },
     "/pets": {
-      "get": {
-        "tags": ["Pets"],
-        "summary": "Get all pets",
-        "security": [{ "Bearer": [] }],
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/PetResponse"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
       "post": {
         "tags": ["Pets"],
         "summary": "Add a new pet",
@@ -302,6 +283,72 @@
           },
           "404": {
             "description": "Pet with this ID was not found"
+          }
+        }
+      }
+    },
+    "/notices": {
+      "get": {
+        "tags": ["Notices"],
+        "summary": "Search notices by category and search query",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of page"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Number of items per page"
+          },
+          {
+            "in": "query",
+            "name": "searchQuery",
+            "schema": {
+              "type": "string"
+            },
+            "description": "word or sentense to find in field title"
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string"
+            },
+            "description": "type of animal, breed of animal"
+          },
+          {
+            "in": "query",
+            "name": "sex",
+            "schema": {
+              "type": "string"
+            },
+            "description": "sex of animal: male or female"
+          },
+          {
+            "in": "query",
+            "name": "location",
+            "schema": {
+              "type": "string"
+            },
+            "description": "city, where animal located"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successfully added a new pet",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PetResponse" }
+              }
+            }
           }
         }
       }
@@ -596,7 +643,7 @@
                 "types": "string",
                 "enum": ["male", "female"],
                 "description": "Sex of the animal",
-                "example":"male"
+                "example": "male"
               },
               "location": {
                 "types": "string",

@@ -8,7 +8,7 @@ require('dotenv').config();
 const authRouter = require('./routes/api/auth');
 
 const petsRouter = require('./routes/api/pets');
-const noticesRouter = require('./routes/api/noticesRouter');
+const noticesRouter = require('./routes/api/notices');
 const friendsRouter = require('./routes/api/friends');
 
 const app = express();

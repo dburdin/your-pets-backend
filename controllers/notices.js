@@ -10,6 +10,7 @@ const getNotices = async (req, res) => {
     $and: [
       {
         ...Object.entries(req.query).reduce((acc, [key, value]) => {
+          if (key === "price") return acc;
           acc[key] = { $regex: new RegExp(value, "i") };
           return acc;
         }, {}),
