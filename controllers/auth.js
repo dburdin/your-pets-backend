@@ -86,8 +86,10 @@ const updateUser = async (req, res) => {
     if (file.size > 3 * 1024 * 1024) {
       throw HttpError(400, "file size should be less then 3 mb");
     }
-    const { url } = await ImageService.save(req, avatarFolders.userAvatar);
-    req.body.avatarURL = url;
+    const data = await ImageService.save(req, avatarFolders.userAvatar);
+
+    req.body.avatarURL = data.url;
+    req.body.avatar_public_id = data.public_id;
   }
 
   const updatedUser = await User.findByIdAndUpdate(

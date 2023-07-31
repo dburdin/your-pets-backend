@@ -553,7 +553,7 @@
       },
       "delete": {
         "tags": ["Notices"],
-        "summary": "Get notice by ID",
+        "summary": "Delete notice by ID",
         "security": [
           {
             "Bearer": []
