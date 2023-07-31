@@ -2,9 +2,9 @@ const { ctrlWrapper, HttpError } = require("../helpers");
 const { Pet, User } = require("../models");
 
 const getNotices = async (req, res) => {
-  const { category, searchQuery = "", page = 1, limit = 10 } = req.query;
+  const { action, searchQuery = "", page = 1, limit = 10 } = req.query;
   const skip = (page - 1) * limit;
-  const action = category ? { action: category } : null;
+  const category = action ? { action: action } : null;
 
   const data = await Pet.find({
     $and: [
@@ -14,7 +14,7 @@ const getNotices = async (req, res) => {
           acc[key] = { $regex: new RegExp(value, "i") };
           return acc;
         }, {}),
-        ...action,
+        ...category,
         title: { $regex: new RegExp(searchQuery, "i") },
       },
       { action: { $ne: "my pet" } },
