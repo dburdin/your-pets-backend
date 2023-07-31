@@ -16,7 +16,9 @@ const ctrlPets = require("../../controllers/pets");
 router.get("/", ctrlNotices.getNotices);
 
 router.get("/favorites", authenticate, ctrlNotices.getFavorites);
+
 router.post("/favorites/:id", authenticate, isValidId, ctrlNotices.addFavorite);
+
 router.delete(
   "/favorites/:id",
   authenticate,

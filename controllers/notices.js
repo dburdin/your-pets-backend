@@ -38,8 +38,11 @@ const getMyNotices = async (req, res) => {
 
 const getById = async (req, res) => {
   const { id } = req.params;
-  console.log(id);
+
   const pet = await Pet.findById(id);
+  if (!pet) {
+    throw HttpError(404, "not found");
+  }
 
   res.json(pet);
 };
@@ -55,14 +58,14 @@ const addFavorite = async (req, res) => {
   const { _id: owner, favoritePets } = req.user;
 
   if (favoritePets.includes(id)) {
-    throw HttpError(409, "Pet is already in favorites");
+    throw HttpError(409, "Notice is already in favorites");
   }
 
   await User.findByIdAndUpdate(owner, {
     $push: { favoritePets: id },
   });
 
-  res.json({ message: `Pet was added to favorites of ${req.user.name}` });
+  res.json({ message: `Notice was added to favorites of ${req.user.name}` });
 };
 
 const deleteFavorite = async (req, res) => {
@@ -70,7 +73,7 @@ const deleteFavorite = async (req, res) => {
   const { favoritePets } = req.user;
 
   if (!favoritePets.includes(id)) {
-    throw HttpError(409, `Pet with ${id} was not found`);
+    throw HttpError(409, `Notice with ${id} was not found`);
   }
 
   const result = await User.findByIdAndUpdate(req.user._id, {
@@ -78,10 +81,10 @@ const deleteFavorite = async (req, res) => {
   });
 
   if (!result) {
-    throw HttpError(404, `Pet with ${id} was not found`);
+    throw HttpError(404, `Notice with ${id} was not found`);
   }
 
-  res.json({ message: "Pet was removed from favorites" });
+  res.json({ message: "Notice was removed from favorites" });
 };
 
 module.exports = {

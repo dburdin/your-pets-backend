@@ -253,6 +253,10 @@
                 "schema": { "$ref": "#/components/schemas/PetResponse" }
               }
             }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
           }
         }
       }
@@ -279,7 +283,12 @@
         ],
         "responses": {
           "200": {
-            "description": "Pets was deleted successfully"
+            "description": "Pets was deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PetResponse" }
+              }
+            }
           },
           "404": {
             "description": "Pet with this ID was not found"
@@ -292,6 +301,14 @@
         "tags": ["Notices"],
         "summary": "Search notices by category and search query",
         "parameters": [
+          {
+            "in": "query",
+            "name": "category",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by category: sell, in good hands, lost/found"
+          },
           {
             "in": "query",
             "name": "page",
@@ -342,13 +359,221 @@
           }
         ],
         "responses": {
-          "201": {
-            "description": "Successfully added a new pet",
+          "200": {
+            "description": "Notices according to your filter",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/PetResponse" }
               }
             }
+          }
+        }
+      },
+      "post": {
+        "tags": ["Notices"],
+        "summary": "Add a new notice",
+        "security": [{ "Bearer": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/lost found"
+                  },
+                  {
+                    "$ref": "#/components/schemas/sell"
+                  },
+                  {
+                    "$ref": "#/components/schemas/in good hands"
+                  },
+                  {
+                    "$ref": "#/components/schemas/my pet"
+                  }
+                ],
+                "discriminator": { "propertyName": "action" }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "petAvatar": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successfully added a new notice",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PetResponse" }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid request body)",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/notices/user/notices": {
+      "get": {
+        "tags": ["Notices"],
+        "summary": "Get current user's notices",
+       "security":[{"Bearer":[]}],
+        "responses": {
+          "200": {
+            "description": "Notices of the current User",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PetResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notices/favorites": {
+      "get": {
+        "tags": ["Notices"],
+        "summary": "Get favorite notices of current User",
+        "security": [{ "Bearer": [] }],
+        "responses": {
+          "200": {
+            "description": "Favorite notices",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PetResponse" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notices/favorites/{id}": {
+      "post": {
+        "tags": ["Notices"],
+        "summary": "Add a notice to favorite",
+        "security": [{ "Bearer": [] }],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Id of the notice"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Successfully added a notice to favorites"
+          },
+          "404": {
+            "description": "Notice with this ID was not found"
+          },
+          "409": {
+            "description": "Notice is already in favorites"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Notices"],
+        "summary": "Remove notice from favorites",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Id of the notice"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notice was successfully removed"
+          },
+          "404": {
+            "description": "Notice was not found"
+          }
+        }
+      }
+    },
+    "/notices/{id}": {
+      "get": {
+        "tags": ["Notices"],
+        "summary": "Get notice by ID",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Id of the notice"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notice by id",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PetResponse" }
+              }
+            }
+          },
+          "404": {
+            "description": "Notice with this ID was not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Notices"],
+        "summary": "Get notice by ID",
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "schema": {
+              "type": "string"
+            },
+            "required": true,
+            "description": "Id of the notice"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Notice was successfully deleted"
+          },
+          "404": {
+            "description": "Notice with this ID was not found, or you not authorized to delete it"
           }
         }
       }

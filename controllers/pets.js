@@ -37,7 +37,7 @@ const deletePet = async (req, res) => {
   if (!pet) {
     throw HttpError(
       404,
-      `Pet with ${id} was not found, or it is not your notice to delete it`
+      `Pet with ${id} was not found, or you not authorized to delete it`
     );
   }
 
