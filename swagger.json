@@ -299,15 +299,15 @@
     "/notices": {
       "get": {
         "tags": ["Notices"],
-        "summary": "Search notices by category and search query",
+        "summary": "Search notices by action and search query",
         "parameters": [
           {
             "in": "query",
-            "name": "category",
+            "name": "action",
             "schema": {
               "type": "string"
             },
-            "description": "Filter by category: sell, in good hands, lost/found"
+            "description": "Filter by action: sell, in good hands, lost/found"
           },
           {
             "in": "query",
