@@ -36,6 +36,9 @@ const userSchema = new Schema(
       type: String,
       required: true,
     },
+    avatar_public_id: {
+      type: String,
+    },
     city: { type: String },
     phone: { type: String },
     myPets: [{ type: Schema.Types.ObjectId, ref: "pet" }],
@@ -77,7 +80,7 @@ const updateSchema = Joi.object({
     "string.pattern.base": "Birth date format: DD-MM-YYYY",
   }),
   phone: Joi.string(),
-  city: Joi.string()
+  city: Joi.string(),
 });
 
 const schemas = {

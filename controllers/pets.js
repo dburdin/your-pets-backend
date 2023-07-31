@@ -12,8 +12,9 @@ const addPet = async (req, res) => {
     if (file.size > 3 * 1024 * 1024) {
       throw HttpError(400, "file size should be less then 3 mb");
     }
-    const { url } = await ImageService.save(req, avatarFolders.petAvatar);
-    req.body.petAvatar = url;
+    const data = await ImageService.save(req, avatarFolders.petAvatar);
+    req.body.petAvatar = data.url;
+    req.body.avatar_public_id = data.public_id;
   }
 
   const newPet = await Pet.create({
@@ -40,6 +41,8 @@ const deletePet = async (req, res) => {
       `Pet with ${id} was not found, or you not authorized to delete it`
     );
   }
+
+  ImageService.delete(pet.avatar_public_id);
 
   if (pet.action === actionTypeEnum.MYPET) {
     await User.findByIdAndUpdate(req.user._id, {

@@ -44,6 +44,9 @@ const petSchema = new Schema(
     petAvatar: {
       type: String,
     },
+    avatar_public_id: {
+      type: String,
+    },
     action: {
       type: String,
       enum: actionTypeEnum,
@@ -102,6 +105,7 @@ const joiPetSchema = Joi.object({
   comments: Joi.string().min(1).max(120),
   location: Joi.string(),
   petAvatar: Joi.string(),
+  avatar_public_id: Joi.string(),
   title: Joi.string(),
   sex: Joi.string().valid(...Object.values(petEnum)),
   action: Joi.string().valid(...Object.values(actionTypeEnum)),

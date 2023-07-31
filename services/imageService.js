@@ -47,17 +47,29 @@ class ImageService {
 
     const imageUri = parser.format(fileName, file.buffer);
 
-    const imageUrl = await cloudinary.uploader.upload(imageUri.content, {
-      folder: folderName,
-      transformation: {
-        width: 250,
-        height: 250,
-        crop: "fill",
-        quality: 60,
-        radius: 40,
-      },
-    });
-    return imageUrl;
+    try {
+      const imageUrl = await cloudinary.uploader.upload(imageUri.content, {
+        folder: folderName,
+        transformation: {
+          width: 250,
+          height: 250,
+          crop: "fill",
+          quality: 60,
+          radius: 40,
+        },
+      });
+      return imageUrl;
+    } catch (error) {
+      throw HttpError(500, "Cloudinary server error");
+    }
+  }
+
+  static async delete(public_id) {
+    try {
+      cloudinary.uploader.destroy(public_id);
+    } catch (error) {
+      throw HttpError(500, "Cloudinary server error");
+    }
   }
 }
 
