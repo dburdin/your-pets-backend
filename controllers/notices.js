@@ -39,7 +39,7 @@ const getMyNotices = async (req, res) => {
 const getById = async (req, res) => {
   const { id } = req.params;
 
-  const pet = await Pet.findById(id);
+  const pet = await Pet.findById(id).populate("owner", "-token -password");
   if (!pet) {
     throw HttpError(404, "not found");
   }
