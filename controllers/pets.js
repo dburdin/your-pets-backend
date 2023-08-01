@@ -31,14 +31,14 @@ const addPet = async (req, res) => {
 };
 
 const deletePet = async (req, res) => {
-  const { id } = req.params;
-  const { _id } = req.user;
+  const { id: petId } = req.params;
+  const { _id: userId } = req.user;
 
-  const pet = await Pet.findOneAndDelete({ _id: id, owner: _id });
+  const pet = await Pet.findOneAndDelete({ userId: petId, owner: userId });
   if (!pet) {
     throw HttpError(
       404,
-      `Pet with ${id} was not found, or you not authorized to delete it`
+      `Pet with ${petId} was not found, or you not authorized to delete it`
     );
   }
 
@@ -46,7 +46,7 @@ const deletePet = async (req, res) => {
 
   if (pet.action === actionTypeEnum.MYPET) {
     await User.findByIdAndUpdate(req.user._id, {
-      $pull: { myPets: id },
+      $pull: { myPets: petId },
     });
   }
 
