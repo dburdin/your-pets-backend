@@ -37,7 +37,7 @@ const petSchema = new Schema(
     },
     comments: {
       type: String,
-      minLength: 1,
+      minLength: 0,
       maxLength: 120,
       default: null,
     },
@@ -103,7 +103,7 @@ const joiPetSchema = Joi.object({
     .max(16)
     .regex(generalRegExp, "Only English letters can be accepted")
     .required(),
-  comments: Joi.string().min(1).max(120),
+  comments: Joi.string().min(0).max(120),
   location: Joi.string(),
   petAvatar: Joi.string(),
   avatar_public_id: Joi.string(),
