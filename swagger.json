@@ -213,43 +213,8 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/lost found"
-                  },
-                  {
-                    "$ref": "#/components/schemas/sell"
-                  },
-                  {
-                    "$ref": "#/components/schemas/in good hands"
-                  },
-                  {
-                    "$ref": "#/components/schemas/my pet"
-                  }
-                ],
-                "discriminator": { "propertyName": "action" }
-              }
-            },
             "multipart/form-data": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/lost found"
-                  },
-                  {
-                    "$ref": "#/components/schemas/sell"
-                  },
-                  {
-                    "$ref": "#/components/schemas/in good hands"
-                  },
-                  {
-                    "$ref": "#/components/schemas/my pet"
-                  }
-                ],
-                "discriminator": { "propertyName": "action" }
-              }
+              "schema": { "$ref": "#/components/schemas/PetRequest" }
             }
           }
         },
@@ -291,12 +256,7 @@
         ],
         "responses": {
           "200": {
-            "description": "Pets was deleted successfully",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/PetResponse" }
-              }
-            }
+            "description": "Pets was deleted successfully"
           },
           "404": {
             "description": "Pet with this ID was not found"
@@ -373,7 +333,10 @@
             "description": "Notices according to your filter",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PetResponse" }
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/PetResponseFull" }
+                }
               }
             }
           }
@@ -386,43 +349,8 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/lost found"
-                  },
-                  {
-                    "$ref": "#/components/schemas/sell"
-                  },
-                  {
-                    "$ref": "#/components/schemas/in good hands"
-                  },
-                  {
-                    "$ref": "#/components/schemas/my pet"
-                  }
-                ],
-                "discriminator": { "propertyName": "action" }
-              }
-            },
             "multipart/form-data": {
-              "schema": {
-                "oneOf": [
-                  {
-                    "$ref": "#/components/schemas/lost found"
-                  },
-                  {
-                    "$ref": "#/components/schemas/sell"
-                  },
-                  {
-                    "$ref": "#/components/schemas/in good hands"
-                  },
-                  {
-                    "$ref": "#/components/schemas/my pet"
-                  }
-                ],
-                "discriminator": { "propertyName": "action" }
-              }
+              "schema": { "$ref": "#/components/schemas/PetRequest" }
             }
           }
         },
@@ -442,7 +370,7 @@
         }
       }
     },
-    "/notices/user/notices": {
+    "/notices/own": {
       "get": {
         "tags": ["Notices"],
         "summary": "Get current user's notices",
@@ -452,7 +380,10 @@
             "description": "Notices of the current User",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PetResponse" }
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/PetResponseFull" }
+                }
               }
             }
           }
@@ -469,7 +400,10 @@
             "description": "Favorite notices",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/PetResponse" }
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/PetResponseFull" }
+                }
               }
             }
           }
@@ -799,25 +733,25 @@
             "example": "Corgie"
           },
           "comments": {
-            "types": "string",
+            "type": "string",
             "description": "User's description about the dog"
           },
           "sex": {
-            "types": "string",
+            "type": "string",
             "enum": ["male", "female"],
             "description": "Sex of the animal"
           },
           "action": {
-            "types": "string",
+            "type": "string",
             "enum": ["sell", "in good hands", "lost/found", "my pet"],
             "description": "Which group it belongs: sell, in good hands, my pet, lost/found"
           },
           "price": {
-            "types": "string",
+            "type": "string",
             "description": "Price"
           },
           "location": {
-            "types": "string",
+            "type": "string",
             "description": "Where pet is located"
           },
           "petAvatar": {
@@ -825,47 +759,130 @@
             "description": "Url",
             "example": "https://res.cloudinary.com/dhh42ueby/image/upload/v1690307522/petAvatar/download_aw5p0t.png"
           },
-          "owner": {
-            "$ref": "#/components/schemas/UserFullResponse"
-          }
-        }
-      },
-      "PetAvatar": {
-        "type": "object",
-        "properties": {
-          "petAvatar": {
+          "avatar_public_id": {
             "type": "string",
-            "format": "binary"
+            "example": "petAvatar/to9gatzmdxswrwfxbcjr"
+          },
+          "owner": {
+            "type": "string",
+            "description": "Id of the owner ",
+            "example": "64c8d917b0ddde1de2afb405"
           }
         }
       },
-      "PetRequest": {
+      "PetResponseFull": {
         "type": "object",
-        "required": ["name", "birthday", "type", "action"],
         "properties": {
+          "_id": {
+            "type": "string",
+            "description": "Pet's unique ID",
+            "example": "64c001b21a06f4a80fc18b5"
+          },
           "name": {
             "type": "string",
             "description": "Pet's name",
             "example": "Dogie"
           },
+          "title": {
+            "type": "string",
+            "description": "Title of Notice",
+            "example": "Nice dog, love kids"
+          },
           "birthday": {
             "type": "string",
             "description": "Pet's birthday",
-            "example": "01-01-2001"
+            "example": "01.01.2001"
           },
-
           "type": {
             "type": "string",
             "description": "Breed",
             "example": "Corgie"
           },
           "comments": {
-            "types": "string",
+            "type": "string",
+            "description": "User's description about the dog"
+          },
+          "sex": {
+            "type": "string",
+            "enum": ["male", "female"],
+            "description": "Sex of the animal"
+          },
+          "action": {
+            "type": "string",
+            "enum": ["sell", "in good hands", "lost/found", "my pet"],
+            "description": "Which group it belongs: sell, in good hands, my pet, lost/found"
+          },
+          "price": {
+            "type": "string",
+            "description": "Price"
+          },
+          "location": {
+            "type": "string",
+            "description": "Where pet is located"
+          },
+          "petAvatar": {
+            "type": "string",
+            "description": "Url",
+            "example": "https://res.cloudinary.com/dhh42ueby/image/upload/v1690307522/petAvatar/download_aw5p0t.png"
+          },
+          "avatar_public_id": {
+            "type": "string",
+            "example": "petAvatar/to9gatzmdxswrwfxbcjr"
+          },
+          "owner": {
+            "$ref": "#/components/schemas/UserFullResponse"
+          }
+        }
+      },
+
+      "PetRequest": {
+        "type": "object",
+        "required": ["name", "birthday", "type", "action", "petAvatar"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Pet's name",
+            "example": "Dogie"
+          },
+          "sex": {
+            "type": "string",
+            "enum": ["male", "female"],
+            "description": "Pet's sex, required for sell, lost/found, in good hands actions",
+            "example": "male"
+          },
+          "title": {
+            "type": "string",
+            "description": "Pet's description, required for sell, lost/found, in good hands actions",
+            "example": "Funny dog"
+          },
+          "birthday": {
+            "type": "string",
+            "description": "Pet's birthday",
+            "example": "01-01-2001"
+          },
+          "location": {
+            "type": "string",
+            "description": "Pet's location",
+            "example": "Lviv"
+          },
+          "price": {
+            "type": "number",
+            "description": "Price for the pet, required for sell action ",
+            "example": 10
+          },
+          "petAvatar": { "type": "string", "format": "binary" },
+          "type": {
+            "type": "string",
+            "description": "Breed",
+            "example": "Corgie"
+          },
+          "comments": {
+            "type": "string",
             "description": "User's description about the dog"
           },
 
           "action": {
-            "types": "string",
+            "type": "string",
             "enum": ["sell", "in good hands", "lost/found", "my pet"],
             "description": "Which group it belongs: sell, in good hands, my pet, lost/found",
             "example": "in good hands"
@@ -875,10 +892,11 @@
           "propertyName": "action"
         }
       },
+
       "in good hands": {
         "allOf": [
           { "$ref": "#/components/schemas/PetRequest" },
-          { "$ref": "#/components/schemas/PetAvatar" },
+
           {
             "type": "object",
             "required": ["title", "sex", "location"],
@@ -889,13 +907,13 @@
                 "example": "Nice dog, love kids"
               },
               "sex": {
-                "types": "string",
+                "type": "string",
                 "enum": ["male", "female"],
                 "description": "Sex of the animal",
                 "example": "male"
               },
               "location": {
-                "types": "string",
+                "type": "string",
                 "description": "Price for the animal"
               }
             }
@@ -905,7 +923,7 @@
       "lost found": {
         "allOf": [
           { "$ref": "#/components/schemas/PetRequest" },
-          { "$ref": "#/components/schemas/PetAvatar" },
+
           {
             "type": "object",
             "required": ["title", "sex", "location"],
@@ -916,13 +934,13 @@
                 "example": "Nice dog, love kids"
               },
               "sex": {
-                "types": "string",
+                "type": "string",
                 "enum": ["male", "female"],
                 "description": "Sex of the animal",
                 "example": "male"
               },
               "location": {
-                "types": "string",
+                "type": "string",
                 "description": "Price for the animal"
               }
             }
@@ -932,7 +950,7 @@
       "sell": {
         "allOf": [
           { "$ref": "#/components/schemas/PetRequest" },
-          { "$ref": "#/components/schemas/PetAvatar" },
+
           {
             "type": "object",
             "required": ["title", "sex", "location"],
@@ -943,17 +961,17 @@
                 "example": "Nice dog, love kids"
               },
               "sex": {
-                "types": "string",
+                "type": "string",
                 "enum": ["male", "female"],
                 "description": "Sex of the animal",
                 "example": "male"
               },
               "location": {
-                "types": "string",
+                "type": "string",
                 "description": "Price for the animal"
               },
               "price": {
-                "types": "string",
+                "type": "string",
                 "description": "Price for the animal"
               }
             }
@@ -961,10 +979,7 @@
         ]
       },
       "my pet": {
-        "allOf": [
-          { "$ref": "#/components/schemas/PetRequest" },
-          { "$ref": "#/components/schemas/PetAvatar" }
-        ]
+        "allOf": [{ "$ref": "#/components/schemas/PetRequest" }]
       }
     },
     "securitySchemes": {
