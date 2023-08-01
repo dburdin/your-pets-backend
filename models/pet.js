@@ -43,6 +43,7 @@ const petSchema = new Schema(
     },
     petAvatar: {
       type: String,
+      required: true,
     },
     avatar_public_id: {
       type: String,

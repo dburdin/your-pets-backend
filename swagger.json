@@ -126,7 +126,7 @@
     "/auth/logout": {
       "post": {
         "tags": ["Auth"],
-        "summary": "Get current logged in user info",
+        "summary": "Log out current user",
         "parameters": [],
         "security": [{ "Bearer": [] }],
 
@@ -234,13 +234,21 @@
             },
             "multipart/form-data": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "petAvatar": {
-                    "type": "string",
-                    "format": "binary"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/lost found"
+                  },
+                  {
+                    "$ref": "#/components/schemas/sell"
+                  },
+                  {
+                    "$ref": "#/components/schemas/in good hands"
+                  },
+                  {
+                    "$ref": "#/components/schemas/my pet"
                   }
-                }
+                ],
+                "discriminator": { "propertyName": "action" }
               }
             }
           }
@@ -316,7 +324,7 @@
               "type": "integer"
             },
             "description": "Number of page",
-            "default":1
+            "default": 1
           },
           {
             "in": "query",
@@ -325,7 +333,7 @@
               "type": "integer"
             },
             "description": "Number of items per page",
-            "default":10
+            "default": 10
           },
           {
             "in": "query",
@@ -399,13 +407,21 @@
             },
             "multipart/form-data": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "petAvatar": {
-                    "type": "string",
-                    "format": "binary"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/lost found"
+                  },
+                  {
+                    "$ref": "#/components/schemas/sell"
+                  },
+                  {
+                    "$ref": "#/components/schemas/in good hands"
+                  },
+                  {
+                    "$ref": "#/components/schemas/my pet"
                   }
-                }
+                ],
+                "discriminator": { "propertyName": "action" }
               }
             }
           }
@@ -430,7 +446,7 @@
       "get": {
         "tags": ["Notices"],
         "summary": "Get current user's notices",
-       "security":[{"Bearer":[]}],
+        "security": [{ "Bearer": [] }],
         "responses": {
           "200": {
             "description": "Notices of the current User",
@@ -521,11 +537,6 @@
       "get": {
         "tags": ["Notices"],
         "summary": "Get notice by ID",
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
         "parameters": [
           {
             "in": "path",
@@ -819,6 +830,15 @@
           }
         }
       },
+      "PetAvatar": {
+        "type": "object",
+        "properties": {
+          "petAvatar": {
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
       "PetRequest": {
         "type": "object",
         "required": ["name", "birthday", "type", "action"],
@@ -833,6 +853,7 @@
             "description": "Pet's birthday",
             "example": "01-01-2001"
           },
+
           "type": {
             "type": "string",
             "description": "Breed",
@@ -857,6 +878,7 @@
       "in good hands": {
         "allOf": [
           { "$ref": "#/components/schemas/PetRequest" },
+          { "$ref": "#/components/schemas/PetAvatar" },
           {
             "type": "object",
             "required": ["title", "sex", "location"],
@@ -883,6 +905,7 @@
       "lost found": {
         "allOf": [
           { "$ref": "#/components/schemas/PetRequest" },
+          { "$ref": "#/components/schemas/PetAvatar" },
           {
             "type": "object",
             "required": ["title", "sex", "location"],
@@ -909,6 +932,7 @@
       "sell": {
         "allOf": [
           { "$ref": "#/components/schemas/PetRequest" },
+          { "$ref": "#/components/schemas/PetAvatar" },
           {
             "type": "object",
             "required": ["title", "sex", "location"],
@@ -937,7 +961,10 @@
         ]
       },
       "my pet": {
-        "allOf": [{ "$ref": "#/components/schemas/PetRequest" }]
+        "allOf": [
+          { "$ref": "#/components/schemas/PetRequest" },
+          { "$ref": "#/components/schemas/PetAvatar" }
+        ]
       }
     },
     "securitySchemes": {

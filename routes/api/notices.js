@@ -14,6 +14,7 @@ const ctrlNotices = require("../../controllers/notices");
 const ctrlPets = require("../../controllers/pets");
 
 router.get("/", ctrlNotices.getNotices);
+router.get("/own", authenticate, ctrlNotices.getMyNotices);
 
 router.get("/favorites", authenticate, ctrlNotices.getFavorites);
 
@@ -26,8 +27,7 @@ router.delete(
   ctrlNotices.deleteFavorite
 );
 
-router.get("/:id", authenticate, isValidId, ctrlNotices.getById);
-router.get("/user/notices", authenticate, ctrlNotices.getMyNotices);
+router.get("/:id", isValidId, ctrlNotices.getById);
 
 router.post(
   "/",
