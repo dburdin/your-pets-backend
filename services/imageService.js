@@ -54,8 +54,7 @@ class ImageService {
           width: 250,
           height: 250,
           crop: "fill",
-          quality: 60,
-          radius: 40,
+          quality: 60
         },
       });
       return imageUrl;
