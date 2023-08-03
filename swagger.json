@@ -631,7 +631,7 @@
           },
           "favoritePets": {
             "type": "array",
-            "items": { "$ref": "#/components/schemas/PetResponse" }
+            "items": { "type": "string", "description": "ID of favorite pets" }
           }
         }
       },
