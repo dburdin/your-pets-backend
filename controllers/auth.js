@@ -59,7 +59,7 @@ const login = async (req, res) => {
       token,
     },
     { new: true }
-  ).populate(["myPets", "favoritePets"]);
+  ).populate(["myPets"]);
   updatedUser.password = "";
   res.json(updatedUser);
 };
@@ -67,7 +67,7 @@ const login = async (req, res) => {
 const getCurrent = async (req, res) => {
   const { _id } = req.user;
 
-  const user = await User.findById(_id).populate(["myPets", "favoritePets"]);
+  const user = await User.findById(_id).populate(["myPets"]);
   user.password = "";
   res.json(user);
 };

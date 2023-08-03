@@ -1,6 +1,5 @@
 const { ctrlWrapper, HttpError } = require("../helpers");
 const { Pet, User } = require("../models");
-const { populate } = require("../models/friend");
 
 const getNotices = async (req, res) => {
   const { action, searchQuery = "", page = 1, limit = 10 } = req.query;
@@ -32,7 +31,7 @@ const getMyNotices = async (req, res) => {
   const { _id } = req.user;
   const result = await Pet.find({
     $and: [{ owner: _id }, { action: { $ne: "my pet" } }],
-  }).populate('owner');
+  }).populate("owner");
 
   res.json(result);
 };
@@ -50,8 +49,10 @@ const getById = async (req, res) => {
 
 const getFavorites = async (req, res) => {
   const { _id } = req.user;
-  const { favoritePets } = await User.findById(_id).populate("favoritePets");
-  res.json(favoritePets);
+  const { favoritePets } = await User.findById(_id);
+
+  const data = await Pet.find({ _id: { $in: favoritePets } }).populate('owner');
+  res.json(data);
 };
 
 const addFavorite = async (req, res) => {
