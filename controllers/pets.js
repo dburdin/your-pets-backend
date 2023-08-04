@@ -34,7 +34,7 @@ const deletePet = async (req, res) => {
   const { id: petId } = req.params;
   const { _id: userId } = req.user;
 
-  const pet = await Pet.findOneAndDelete({ userId: petId, owner: userId });
+  const pet = await Pet.findOneAndDelete({ _id: petId, owner: userId });
   if (!pet) {
     throw HttpError(
       404,
