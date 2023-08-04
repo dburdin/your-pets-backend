@@ -20,6 +20,7 @@ const getNotices = async (req, res) => {
       { action: { $ne: "my pet" } },
     ],
   })
+    .sort({ updatedAt: -1 })
     .skip(skip)
     .limit(limit)
     .populate("owner", "-myPets -favoritePets -password -token");
@@ -31,7 +32,9 @@ const getMyNotices = async (req, res) => {
   const { _id } = req.user;
   const result = await Pet.find({
     $and: [{ owner: _id }, { action: { $ne: "my pet" } }],
-  }).populate("owner");
+  })
+    .sort({ updatedAt: -1 })
+    .populate("owner");
 
   res.json(result);
 };
@@ -51,7 +54,9 @@ const getFavorites = async (req, res) => {
   const { _id } = req.user;
   const { favoritePets } = await User.findById(_id);
 
-  const data = await Pet.find({ _id: { $in: favoritePets } }).populate('owner');
+  const data = await Pet.find({ _id: { $in: favoritePets } })
+    .sort({ updatedAt: -1 })
+    .populate("owner");
   res.json(data);
 };
 
